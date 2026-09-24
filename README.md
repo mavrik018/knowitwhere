@@ -1,10 +1,16 @@
-# Where Did I Put That? 📦
+# knowitwhere 📦
 
 A local-only iOS app for remembering where you put physical things. Log an item's location once; find it again in under 5 seconds by typing, glancing at a home-screen widget, or asking Siri.
 
 > **v1 success criterion:** "Hey Siri, where's my passport?" → spoken answer, zero screens opened.
 
-Full requirements: [docs/SRS.md](docs/SRS.md).
+Full requirements: [docs/SRS.md](docs/SRS.md) (written under the working title "Where Did I Put That?").
+
+| | |
+| --- | --- |
+| Bundle ID | `com.AandMapps.knowitwhere` |
+| App Group | `group.com.AandMapps.knowitwhere` |
+| URL scheme | `knowitwhere://` (SRS examples use `wdipit://`) |
 
 ## Stack
 
@@ -15,7 +21,8 @@ Full requirements: [docs/SRS.md](docs/SRS.md).
 | Widget | SwiftUI Widget Extension *(Phase 4)* |
 | Siri | App Intents Extension, Tier 2 "find" *(Phase 4)* |
 | System search | Core Spotlight *(Phase 4)* |
-| Bridge | App Group shared JSON cache via `home_widget` *(Phase 3)* |
+| Bridge | App Group shared JSON cache via `home_widget` |
+| Deep links | `app_links` → `go_router` |
 
 Fully offline. No network calls, accounts, or analytics.
 
@@ -25,8 +32,8 @@ Fully offline. No network calls, accounts, or analytics.
 | --- | --- | --- |
 | 0 | Requirements | ✅ Done |
 | 1 | Design | ⏳ |
-| 2 | Core Flutter app (FR1–FR3) | 🚧 In progress |
-| 3 | Shared data layer, App Group, deep links | ⏳ |
+| 2 | Core Flutter app (FR1–FR3) | ✅ Done |
+| 3 | Shared data layer, App Group, deep links | 🚧 In progress |
 | 4 | Native widget, Siri, Spotlight | ⏳ |
 | 5 | Testing & QA | ⏳ |
 | 6 | Release prep | ⏳ |
@@ -36,7 +43,7 @@ Work is tracked as GitHub issues grouped by milestone (one milestone per phase).
 
 ## Development
 
-Requires Flutter 3.44.x (Dart 3.12).
+Requires Flutter 3.44.x (Dart 3.12). The app targets iOS 17+ (App Intents, current WidgetKit APIs).
 
 ```bash
 flutter pub get
@@ -58,14 +65,37 @@ Generated Drift code (`*.g.dart`) is committed so the app builds without running
 lib/
   app.dart              MaterialApp + routes (/, /add, /item/:id, /item/:id/edit)
   data/                 Drift DB, Item model, repository, photo storage
+  platform/             App Group shared cache, deep-link routing
   features/             home (search + list), item_form (add/edit), item_detail
   theme/                cream / charcoal / green theme
 docs/SRS.md             requirements
 ```
 
-### Mac-only steps (Phases 3–4)
+### Shared cache contract (for the Swift extensions)
 
-App Group provisioning, the Widget Extension and the App Intents Extension are Xcode targets and have to be added on a Mac. See the Phase 3/4 issues.
+After every add/edit/delete, and at launch, the app writes a JSON string to
+`UserDefaults(suiteName: "group.com.AandMapps.knowitwhere")` under the key
+`items`, then reloads the widget timeline of kind `KnowItWhereWidget`:
+
+```json
+[{ "id": "uuid", "name": "HDMI cable", "location": "Drawer 2", "updatedAt": "2026-09-24T10:22:39.123Z" }]
+```
+
+Items are ordered most recently updated first; `updatedAt` is UTC ISO 8601.
+Extensions only read this — the Drift database stays private to the app.
+
+### Deep links
+
+| Link | Opens |
+| --- | --- |
+| `knowitwhere://add` | Add item form |
+| `knowitwhere://item/{id}` | Item detail |
+
+### Signing (Mac)
+
+Set your team under *Signing & Capabilities* for each target. Automatic signing
+registers the App Group `group.com.AandMapps.knowitwhere`; every target (app,
+widget, intents extension) must list the same group.
 
 ## Contributing
 

@@ -1,9 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 
-import 'package:discoverly/app.dart';
-import 'package:discoverly/data/database.dart';
-import 'package:discoverly/data/item_repository.dart';
-import 'package:discoverly/data/photo_store.dart';
+import 'package:knowitwhere/app.dart';
+import 'package:knowitwhere/data/database.dart';
+import 'package:knowitwhere/data/item_repository.dart';
+import 'package:knowitwhere/data/photo_store.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +34,7 @@ void main() {
   });
 
   Future<void> pumpApp(WidgetTester tester) async {
-    await tester.pumpWidget(WdipitApp(repository: repo, photos: photos));
+    await tester.pumpWidget(KnowItWhereApp(repository: repo, photos: photos));
     await tester.pumpAndSettle();
   }
 
@@ -131,5 +132,28 @@ void main() {
     await tester.tap(find.text('Tent'));
     await tester.pumpAndSettle();
     expect(find.bySemanticsLabel('Photo of Tent'), findsOneWidget);
+  });
+
+  testWidgets('deep links open the add form and item detail', (tester) async {
+    final item = await repo.add(name: 'Passport', location: 'Desk drawer');
+    final links = StreamController<Uri>();
+    addTearDown(links.close);
+    await tester.pumpWidget(
+      KnowItWhereApp(repository: repo, photos: photos, deepLinks: links.stream),
+    );
+    await tester.pumpAndSettle();
+
+    links.add(Uri.parse('knowitwhere://item/${item.id}'));
+    await tester.pumpAndSettle();
+    expect(find.text('Stored in'), findsOneWidget);
+
+    links.add(Uri.parse('knowitwhere://add'));
+    await tester.pumpAndSettle();
+    expect(find.text('Save item'), findsOneWidget);
+
+    // Unknown links are ignored.
+    links.add(Uri.parse('knowitwhere://nope'));
+    await tester.pumpAndSettle();
+    expect(find.text('Save item'), findsOneWidget);
   });
 }

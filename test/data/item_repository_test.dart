@@ -1,5 +1,5 @@
-import 'package:discoverly/data/database.dart';
-import 'package:discoverly/data/item_repository.dart';
+import 'package:knowitwhere/data/database.dart';
+import 'package:knowitwhere/data/item_repository.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -63,6 +63,14 @@ void main() {
     await repo.update(a);
 
     expect((await repo.getAll()).map((i) => i.name), ['A', 'B']);
+  });
+
+  test('recency ordering keeps sub-second precision', () async {
+    await repo.add(name: 'First', location: 'x');
+    now = now.add(const Duration(milliseconds: 5));
+    await repo.add(name: 'Second', location: 'x');
+
+    expect((await repo.getAll()).map((i) => i.name), ['Second', 'First']);
   });
 
   test('delete removes the item and restore brings it back', () async {
