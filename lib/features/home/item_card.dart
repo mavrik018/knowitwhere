@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 
 import '../../app_scope.dart';
 import '../../data/database.dart';
@@ -6,17 +7,33 @@ import '../../widgets/item_photo.dart';
 
 /// A "name → location" row on the home list.
 class ItemCard extends StatelessWidget {
-  const ItemCard({super.key, required this.item, required this.onTap});
+  const ItemCard({
+    super.key,
+    required this.item,
+    required this.onTap,
+    this.onDelete,
+  });
 
   final Item item;
   final VoidCallback onTap;
 
+  /// Offered to VoiceOver as a custom action, mirroring swipe-to-delete.
+  final VoidCallback? onDelete;
+
+  static const deleteAction = CustomSemanticsAction(label: 'Delete');
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final onDelete = this.onDelete;
     return Semantics(
       button: true,
       label: '${item.name}, stored in ${item.location}',
+      // The children are excluded, so the tap must be re-exposed here.
+      onTap: onTap,
+      customSemanticsActions: onDelete == null
+          ? null
+          : {deleteAction: onDelete},
       excludeSemantics: true,
       child: Card(
         clipBehavior: Clip.antiAlias,

@@ -70,9 +70,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Semantics(
                           header: true,
-                          child: Text(
-                            'Where did I put that?',
-                            style: theme.textTheme.headlineMedium,
+                          // Like iOS large titles, the headline grows less
+                          // than body text so the list stays on screen at
+                          // accessibility sizes.
+                          child: MediaQuery.withClampedTextScaling(
+                            maxScaleFactor: 1.5,
+                            child: Text(
+                              'Where did I put that?',
+                              style: theme.textTheme.headlineMedium,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -135,6 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: ItemCard(
                             item: item,
                             onTap: () => context.push('/item/${item.id}'),
+                            onDelete: () => _delete(item),
                           ),
                         );
                       },
