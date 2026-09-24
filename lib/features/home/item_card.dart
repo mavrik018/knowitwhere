@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 
-import '../../app_scope.dart';
 import '../../data/database.dart';
-import '../../widgets/item_photo.dart';
+import '../../theme/app_theme.dart';
+import '../../widgets/pinned_photo.dart';
 
-/// A "name → location" row on the home list.
-class ItemCard extends StatelessWidget {
-  const ItemCard({
+/// Board view card: pinned photo, name, location.
+class ItemBoardCard extends StatelessWidget {
+  const ItemBoardCard({
     super.key,
     required this.item,
     required this.onTap,
@@ -16,71 +16,57 @@ class ItemCard extends StatelessWidget {
 
   final Item item;
   final VoidCallback onTap;
-
-  /// Offered to VoiceOver as a custom action, mirroring swipe-to-delete.
   final VoidCallback? onDelete;
-
-  static const deleteAction = CustomSemanticsAction(label: 'Delete');
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final onDelete = this.onDelete;
-    return Semantics(
-      button: true,
-      label: '${item.name}, stored in ${item.location}',
-      // The children are excluded, so the tap must be re-exposed here.
+    return _ItemSemantics(
+      item: item,
       onTap: onTap,
-      customSemanticsActions: onDelete == null
-          ? null
-          : {deleteAction: onDelete},
-      excludeSemantics: true,
-      child: Card(
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                _Thumbnail(item: item),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(item.name, style: theme.textTheme.titleMedium),
-                      const SizedBox(height: 4),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 2),
-                            child: Icon(
-                              Icons.place_outlined,
-                              size: 16,
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Expanded(
-                            child: Text(
-                              item.location,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+      onDelete: onDelete,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(26),
+          boxShadow: _cardShadow(theme),
+        ),
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(26),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 12, 10, 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  PinnedPhoto(
+                    item: item,
+                    aspectRatio: 1.05,
+                    heroTag: 'photo-${item.id}',
+                    cacheWidth: (220 * MediaQuery.devicePixelRatioOf(context))
+                        .round(),
                   ),
-                ),
-                Icon(
-                  Icons.chevron_right,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ],
+                  const SizedBox(height: 12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.name,
+                          style: theme.textTheme.titleMedium,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        _LocationLine(item.location),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -89,35 +75,157 @@ class ItemCard extends StatelessWidget {
   }
 }
 
-class _Thumbnail extends StatelessWidget {
-  const _Thumbnail({required this.item});
+/// Compact row for the Index, Locations and search views.
+class ItemCard extends StatelessWidget {
+  const ItemCard({
+    super.key,
+    required this.item,
+    required this.onTap,
+    this.onDelete,
+    this.showLocation = true,
+  });
 
   final Item item;
+  final VoidCallback onTap;
 
-  static const _size = 56.0;
+  /// Offered to VoiceOver as a custom action, mirroring swipe-to-delete.
+  final VoidCallback? onDelete;
+
+  /// Off in the Locations view, where the group header already says it.
+  final bool showLocation;
+
+  static const deleteAction = CustomSemanticsAction(label: 'Delete');
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final photoPath = item.photoPath;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: SizedBox.square(
-        dimension: _size,
-        child: photoPath == null
-            ? ColoredBox(
-                color: scheme.surfaceContainerHighest,
-                child: Icon(Icons.inventory_2_outlined, color: scheme.primary),
-              )
-            : Hero(
-                tag: 'photo-${item.id}',
-                child: ItemPhoto(
-                  file: AppScope.of(context).photos.resolve(photoPath),
-                  cacheWidth: (_size * MediaQuery.devicePixelRatioOf(context))
-                      .round(),
-                ),
+    final theme = Theme.of(context);
+    return _ItemSemantics(
+      item: item,
+      onTap: onTap,
+      onDelete: onDelete,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: _cardShadow(theme),
+        ),
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(20),
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 56,
+                    child: PinnedPhoto(
+                      item: item,
+                      radius: 14,
+                      heroTag: 'photo-${item.id}',
+                      cacheWidth: (56 * MediaQuery.devicePixelRatioOf(context))
+                          .round(),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(item.name, style: theme.textTheme.titleMedium),
+                        if (showLocation) ...[
+                          const SizedBox(height: 3),
+                          _LocationLine(item.location, maxLines: 2),
+                        ],
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.chevron_right,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ],
               ),
+            ),
+          ),
+        ),
       ),
+    );
+  }
+}
+
+List<BoxShadow> _cardShadow(ThemeData theme) =>
+    theme.brightness == Brightness.dark
+    ? const []
+    : const [
+        BoxShadow(
+          color: Color(0x14000000),
+          blurRadius: 18,
+          offset: Offset(0, 6),
+        ),
+      ];
+
+class _LocationLine extends StatelessWidget {
+  const _LocationLine(this.location, {this.maxLines = 1});
+
+  final String location;
+  final int maxLines;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(top: 2),
+          child: Icon(Icons.place_outlined, size: 17, color: AppColors.orange),
+        ),
+        const SizedBox(width: 4),
+        Expanded(
+          child: Text(
+            location,
+            maxLines: maxLines,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// One VoiceOver element per item: "{name}, stored in {location}", with tap
+/// to open and a Delete custom action.
+class _ItemSemantics extends StatelessWidget {
+  const _ItemSemantics({
+    required this.item,
+    required this.onTap,
+    required this.onDelete,
+    required this.child,
+  });
+
+  final Item item;
+  final VoidCallback onTap;
+  final VoidCallback? onDelete;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final onDelete = this.onDelete;
+    return Semantics(
+      button: true,
+      label: '${item.name}, stored in ${item.location}',
+      // The children are excluded, so the tap must be re-exposed here.
+      onTap: onTap,
+      customSemanticsActions: onDelete == null
+          ? null
+          : {ItemCard.deleteAction: onDelete},
+      excludeSemantics: true,
+      child: child,
     );
   }
 }

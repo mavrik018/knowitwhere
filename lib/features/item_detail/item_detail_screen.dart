@@ -5,7 +5,10 @@ import '../../app_scope.dart';
 import '../../data/database.dart';
 import '../../util/relative_date.dart';
 import '../../widgets/empty_state.dart';
-import '../../widgets/item_photo.dart';
+import '../../theme/app_theme.dart';
+import '../../widgets/pinned_photo.dart';
+import '../../widgets/section_label.dart';
+import '../../widgets/siri_bar.dart';
 
 class ItemDetailScreen extends StatefulWidget {
   const ItemDetailScreen({super.key, required this.itemId});
@@ -82,6 +85,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
 
   Widget _buildItem(BuildContext context, Item item) {
     final theme = Theme.of(context);
+    final palette = AppPalette.of(context);
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -98,63 +102,82 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
         children: [
-          if (item.photoPath case final photoPath?) ...[
-            Hero(
-              tag: 'photo-${item.id}',
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: AspectRatio(
-                  aspectRatio: 4 / 3,
-                  child: ItemPhoto(
-                    file: AppScope.of(context).photos.resolve(photoPath),
-                    semanticLabel: 'Photo of ${item.name}',
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-          ],
+          PinnedPhoto(
+            item: item,
+            aspectRatio: item.photoPath == null ? 2.2 : 4 / 3,
+            radius: 28,
+            heroTag: 'photo-${item.id}',
+            semanticLabel: 'Photo of ${item.name}',
+          ),
+          const SizedBox(height: 24),
           Semantics(
             header: true,
             child: Text(item.name, style: theme.textTheme.headlineMedium),
           ),
           const SizedBox(height: 16),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Icons.place_outlined, color: theme.colorScheme.primary),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Stored in',
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(item.location, style: theme.textTheme.titleLarge),
-                      ],
-                    ),
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: palette.accentSoft,
+              borderRadius: BorderRadius.circular(22),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: const BoxDecoration(
+                    color: AppColors.orange,
+                    shape: BoxShape.circle,
                   ),
-                ],
+                  child: const Icon(Icons.place, color: Colors.white),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Stored in',
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: palette.accentText,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(item.location, style: theme.textTheme.titleLarge),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Icon(
+                Icons.history_rounded,
+                size: 18,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
-            ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  'Updated ${relativeDate(item.dateUpdated, DateTime.now())}',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          Text(
-            'Updated ${relativeDate(item.dateUpdated, DateTime.now())}',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
+          const SizedBox(height: 28),
+          const Eyebrow('Ask Siri'),
+          const SizedBox(height: 10),
+          SiriBar(phrase: 'Hey Siri, where’s my ${item.name} in knowitwhere?'),
         ],
       ),
     );

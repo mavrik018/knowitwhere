@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app.dart';
 import 'data/app_directory.dart';
@@ -25,11 +26,18 @@ Future<void> main() async {
         : const NoopItemChangeSink(),
   );
   final photos = PhotoStore(dir);
+  final prefs = await SharedPreferencesWithCache.create(
+    cacheOptions: const SharedPreferencesWithCacheOptions(
+      allowList: {_onboardedKey},
+    ),
+  );
 
   runApp(
     KnowItWhereApp(
       repository: repository,
       photos: photos,
+      showOnboarding: !(prefs.getBool(_onboardedKey) ?? false),
+      onOnboardingDone: () => prefs.setBool(_onboardedKey, true),
       deepLinks: Platform.isIOS
           ? _merge([AppLinks().uriLinkStream, spotlightTaps()])
           : null,
@@ -38,6 +46,8 @@ Future<void> main() async {
 
   unawaited(_startupMaintenance(repository, photos));
 }
+
+const _onboardedKey = 'onboarded';
 
 Stream<T> _merge<T>(List<Stream<T>> streams) {
   final subs = <StreamSubscription<T>>[];

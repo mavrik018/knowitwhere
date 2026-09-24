@@ -51,11 +51,13 @@ where did i put,storage tracker,item finder,inventory,declutter,find my stuff,or
 
 **Screenshots:** use the hero-shot pattern from Phase 1: a large caption over a device frame, cream background. Required size is 6.9" (1320 × 2868); Apple scales it down for smaller displays. Suggested set:
 
-1. "Where did I put that?" (home list with a search in progress)
-2. "Save it in seconds" (add form with photo)
-3. "Ask Siri" (Siri answer banner)
+1. "Never lose it again" (onboarding hero with the squirrel)
+2. "Where is my…?" (home board with photo cards)
+3. "Ask Siri" ("Hey Siri, where's my passport in knowitwhere?" and the spoken answer)
 4. "Right on your home screen" (medium widget)
 5. "Private. On your phone only." (detail screen)
+
+Draft renders of the in-app screens are in `docs/screens/`.
 
 ## App Privacy (6.2)
 
