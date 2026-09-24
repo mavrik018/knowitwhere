@@ -1,0 +1,34 @@
+name: Bug report
+description: Something doesn't work as the SRS says it should
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, what you got.
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Surface
+      options:
+        - Flutter app
+        - Home-screen widget
+        - Siri
+        - Spotlight
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Add an item named "Passport" at "Desk drawer"
+        2. ...
+  - type: input
+    id: device
+    attributes:
+      label: Device / iOS version
+      placeholder: iPhone 15, iOS 19.1

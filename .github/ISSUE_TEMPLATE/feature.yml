@@ -1,0 +1,22 @@
+name: Feature request
+description: Propose a change or addition
+labels: [enhancement]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What should change?
+    validations:
+      required: true
+  - type: textarea
+    id: faster
+    attributes:
+      label: Does this make "add" or "find" faster?
+      description: The SRS rule (§1). If it doesn't clearly pass, it belongs in the v1 backlog (§9).
+    validations:
+      required: true
+  - type: input
+    id: srs
+    attributes:
+      label: Related SRS section / FR
+      placeholder: FR2.3
