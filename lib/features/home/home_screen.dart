@@ -43,12 +43,20 @@ class _HomeScreenState extends State<HomeScreen> {
     final messenger = ScaffoldMessenger.of(context);
     await repo.delete(item.id);
     messenger
-      ..hideCurrentSnackBar()
+      ..clearSnackBars()
       ..showSnackBar(
         SnackBar(
-          content: Text('Deleted "${item.name}"'),
+          duration: const Duration(seconds: 3),
+          content: Text(
+            'Deleted "${item.name}"',
+            style: const TextStyle(
+              color: Color(0xFFFBF8F2),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
           action: SnackBarAction(
             label: 'Undo',
+            textColor: AppColors.orange,
             onPressed: () => repo.restore(item),
           ),
         ),
@@ -129,11 +137,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 hintText: 'Where is my…',
                 prefixIcon: const Icon(Icons.search_rounded),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(14),
                   borderSide: const BorderSide(
                     color: AppColors.orange,
                     width: 2,
@@ -143,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ? null
                     : IconButton(
                         tooltip: 'Clear search',
-                        icon: const Icon(Icons.close_rounded),
+                        icon: const Icon(Icons.cancel_rounded, size: 20),
                         onPressed: () => setState(() => _search.clear()),
                       ),
               ),

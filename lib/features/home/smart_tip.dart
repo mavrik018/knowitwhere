@@ -11,7 +11,7 @@ class SmartTip extends StatelessWidget {
 
   static const tips = [
     'Hands full? Ask Siri: “$siriPhraseShort”',
-    'Add the knowitwhere widget to your home screen to see where things are '
+    'Add the KnowItWhere widget to your home screen to see where things are '
         'at a glance.',
     'Snap a photo of the spot. Future you will thank you.',
     'Moved something? Update it so Siri gives the right answer.',
@@ -19,7 +19,7 @@ class SmartTip extends StatelessWidget {
         'Spotlight too.',
   ];
 
-  static const siriPhraseShort = 'Where’s my passport in knowitwhere?';
+  static const siriPhraseShort = 'Where’s my passport in KnowItWhere?';
 
   @override
   Widget build(BuildContext context) {

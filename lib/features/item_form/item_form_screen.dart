@@ -97,9 +97,9 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _saving = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Could not save: $e')));
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(content: Text('Could not save: $e')));
     }
   }
 
@@ -141,9 +141,11 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
       }
     } on PlatformException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Couldn't open photos: ${e.message ?? e.code}")),
-      );
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(content: Text("Couldn't open photos: ${e.message ?? e.code}")),
+        );
     }
   }
 
@@ -184,10 +186,21 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
             autofocus: !_isEdit,
             textCapitalization: TextCapitalization.sentences,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'What is it?',
               hintText: 'e.g. Passport',
-              prefixIcon: Icon(Icons.inventory_2_outlined),
+              prefixIcon: const Icon(Icons.inventory_2_outlined),
+              suffixIcon: ValueListenableBuilder<TextEditingValue>(
+                valueListenable: _name,
+                builder: (context, value, _) {
+                  if (value.text.isEmpty) return const SizedBox.shrink();
+                  return IconButton(
+                    tooltip: 'Clear name',
+                    icon: const Icon(Icons.cancel_rounded, size: 20),
+                    onPressed: () => _name.clear(),
+                  );
+                },
+              ),
             ),
             validator: (v) => _required(v, 'Give it a name'),
           ),
@@ -197,10 +210,21 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
             textCapitalization: TextCapitalization.sentences,
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => _save(),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Where is it?',
               hintText: 'e.g. Desk, top drawer',
-              prefixIcon: Icon(Icons.place_outlined),
+              prefixIcon: const Icon(Icons.place_outlined),
+              suffixIcon: ValueListenableBuilder<TextEditingValue>(
+                valueListenable: _location,
+                builder: (context, value, _) {
+                  if (value.text.isEmpty) return const SizedBox.shrink();
+                  return IconButton(
+                    tooltip: 'Clear location',
+                    icon: const Icon(Icons.cancel_rounded, size: 20),
+                    onPressed: () => _location.clear(),
+                  );
+                },
+              ),
             ),
             validator: (v) => _required(v, 'Where did you put it?'),
           ),

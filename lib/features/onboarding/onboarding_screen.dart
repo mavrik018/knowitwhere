@@ -5,10 +5,9 @@ import 'package:flutter/services.dart';
 
 import '../../theme/app_theme.dart';
 import '../../widgets/mascot.dart';
-import '../../widgets/siri_bar.dart';
 
-/// First-launch hero: "Never lose it again", the squirrel, and a Siri
-/// example. Shown once; [onDone] records that and opens the app.
+/// First-launch hero: "Never lose it again" and the squirrel mascot.
+/// Shown once; [onDone] records that and opens the app.
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key, required this.onDone});
 
@@ -27,13 +26,13 @@ class OnboardingScreen extends StatelessWidget {
               // Scale the hero to the screen so small phones fit without
               // scrolling; very large text still scrolls.
               final titleSize = (height * 0.075).clamp(44.0, 64.0);
-              final stageHeight = (height * 0.47).clamp(220.0, 460.0);
+              final stageHeight = (height * 0.50).clamp(220.0, 500.0);
               return SingleChildScrollView(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: height),
                   child: IntrinsicHeight(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+                      padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -43,9 +42,7 @@ class OnboardingScreen extends StatelessWidget {
                             height: stageHeight,
                             child: const _MascotStage(),
                           ),
-                          const SizedBox(height: 12),
-                          const SiriBar(),
-                          const SizedBox(height: 14),
+                          const SizedBox(height: 24),
                           FilledButton(
                             onPressed: onDone,
                             child: const Text('Get started'),
