@@ -1,0 +1,36 @@
+name: Swift kit
+
+on:
+  pull_request:
+    paths:
+      - "ios/KnowItWhereKit/**"
+      - ".github/workflows/swift.yml"
+  push:
+    branches: [main]
+    paths:
+      - "ios/KnowItWhereKit/**"
+      - ".github/workflows/swift.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: swift-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: ios/KnowItWhereKit
+
+jobs:
+  test:
+    name: Test (macOS) & build (iOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift --version
+      - name: Unit tests
+        run: swift test
+      - name: Build every target for iOS
+        run: >
+          xcodebuild build -quiet
+          -scheme KnowItWhereKit-Package
+          -destination 'generic/platform=iOS'
