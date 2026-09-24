@@ -95,6 +95,8 @@ Extensions only read this — the Drift database stays private to the app.
 
 ### Docs
 
+- **[Handoff runbook](docs/HANDOFF.md): everything left to finish, step by step (start here on the Mac)**
+- Public pages (privacy, support) in [site/](site), published by the Pages workflow once the repo is public
 - [Screen previews](docs/screens): rendered by `flutter test tool/screenshots/screenshots_test.dart --update-goldens`
 - [Siri voice UX](docs/siri-voice-ux.md): phrases, spoken copy, matching
 - [Phase 4 Xcode setup](docs/phase-4-xcode-setup.md): adding the widget and Siri targets on a Mac

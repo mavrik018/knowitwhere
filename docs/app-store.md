@@ -63,9 +63,13 @@ Draft renders of the in-app screens are in `docs/screens/`.
 
 App Store Connect → App Privacy → **Data Not Collected**. There are no network calls, analytics SDKs or accounts (SRS §7). Nothing leaves the device apart from the user's own iCloud/iTunes device backup, which Apple doesn't count as collection.
 
-**Privacy policy URL:** still needed. Apple requires one even for apps that collect nothing. A one-paragraph page ("knowitwhere stores all data on your device and collects nothing") is enough, but it has to be publicly reachable. The GitHub repo is private, so it can't host it as-is.
+**Privacy policy URL:** https://mavrik018.github.io/knowitwhere/privacy.html
 
-**Support URL:** also required and must be public. It can be the same page with a contact email.
+**Support URL:** https://mavrik018.github.io/knowitwhere/support.html
+
+**Marketing URL (optional):** https://mavrik018.github.io/knowitwhere/
+
+The pages live in `site/` and are published by `.github/workflows/pages.yml` once the repo is public (see Task 6 in `docs/HANDOFF.md`). Check that each URL loads before you submit.
 
 ### Usage strings in Info.plist
 
