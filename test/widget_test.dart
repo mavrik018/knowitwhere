@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:discoverly/app.dart';
-import 'package:discoverly/data/database.dart';
-import 'package:discoverly/data/item_repository.dart';
-import 'package:discoverly/data/photo_store.dart';
+import 'package:knowitwhere/app.dart';
+import 'package:knowitwhere/data/database.dart';
+import 'package:knowitwhere/data/item_repository.dart';
+import 'package:knowitwhere/data/photo_store.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +33,7 @@ void main() {
   });
 
   Future<void> pumpApp(WidgetTester tester) async {
-    await tester.pumpWidget(WdipitApp(repository: repo, photos: photos));
+    await tester.pumpWidget(KnowItWhereApp(repository: repo, photos: photos));
     await tester.pumpAndSettle();
   }
 

@@ -1,4 +1,4 @@
-import 'package:discoverly/util/relative_date.dart';
+import 'package:knowitwhere/util/relative_date.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

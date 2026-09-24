@@ -1,5 +1,5 @@
-import 'package:discoverly/data/database.dart';
-import 'package:discoverly/features/search/search_filter.dart';
+import 'package:knowitwhere/data/database.dart';
+import 'package:knowitwhere/features/search/search_filter.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Item _item(String name, String location, int minutesAgo) {

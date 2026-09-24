@@ -16,7 +16,7 @@ Future<void> main() async {
   final repository = ItemRepository(db);
   final photos = PhotoStore(dir);
 
-  runApp(WdipitApp(repository: repository, photos: photos));
+  runApp(KnowItWhereApp(repository: repository, photos: photos));
 
   unawaited(_sweepOrphanPhotos(repository, photos));
 }

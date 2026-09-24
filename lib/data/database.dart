@@ -24,10 +24,10 @@ class Items extends Table {
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
-  /// Opens the on-disk database `wdipit.sqlite` inside [directory].
+  /// Opens the on-disk database `knowitwhere.sqlite` inside [directory].
   factory AppDatabase.open(Future<Object> Function() directory) => AppDatabase(
     driftDatabase(
-      name: 'wdipit',
+      name: 'knowitwhere',
       native: DriftNativeOptions(databaseDirectory: directory),
     ),
   );

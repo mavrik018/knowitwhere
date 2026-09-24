@@ -1,5 +1,5 @@
-import 'package:discoverly/data/database.dart';
-import 'package:discoverly/data/item_repository.dart';
+import 'package:knowitwhere/data/database.dart';
+import 'package:knowitwhere/data/item_repository.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
