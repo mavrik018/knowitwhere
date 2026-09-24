@@ -74,14 +74,9 @@ If all of these pass, start Task 0.
 
 ---
 
-## Task 0: Check the app icon change
+## Task 0: App icon (done)
 
-In the earlier session the user was switching the app icon to the squirrel with `flutter_launcher_icons`. If that has been pushed, check:
-
-1. In `ios/Runner.xcodeproj/project.pbxproj`, `ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS` must be `YES`. A known `flutter_launcher_icons` bug sets it to `AppIcon`; set it back to `YES`.
-2. The icon source images don't need to be Flutter assets. Remove `assets/images/app_icon*.png` from `flutter: assets:` in `pubspec.yaml` so they don't bloat the app bundle (keep the files themselves).
-3. The SRS is iOS-only. If an `android/` folder was added only for icons, ask the user whether to keep it.
-4. `site/icon.png` and `docs/app-store.md` should match the final icon.
+The app icon is the squirrel. The master is `design/app-icon/app-icon-master.png` (1024×1024, no transparency); `python tool/make_app_icon.py` regenerates every iOS size and `site/icon.png`. Don't use `flutter_launcher_icons`: it breaks `ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS` in `project.pbxproj` and adds Android files. The app is iOS-only; there's no `android/` folder.
 
 ## Task 1: Add the widget and Siri extension targets (user + Claude)
 
