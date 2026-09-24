@@ -12,8 +12,6 @@ class SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final label = count == null ? text : '$text · $count';
 
     return Semantics(
@@ -28,14 +26,10 @@ class SectionLabel extends StatelessWidget {
               // Manila craft paper tag
               DecoratedBox(
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0xFF38322B)
-                      : const Color(0xFFFDEEE3),
+                  color: const Color(0xFFFDE8D8),
                   borderRadius: BorderRadius.circular(5.r),
                   border: Border.all(
-                    color: isDark
-                        ? const Color(0x33FFFFFF)
-                        : const Color(0xFFF2D9C8),
+                    color: const Color(0xFFF4D4BD),
                     width: 0.8,
                   ),
                   boxShadow: const [
@@ -58,9 +52,7 @@ class SectionLabel extends StatelessWidget {
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.2,
-                      color: isDark
-                          ? const Color(0xFFF1ECE4)
-                          : const Color(0xFF5D4638),
+                      color: const Color(0xFF5D4638),
                     ),
                   ),
                 ),
@@ -75,9 +67,7 @@ class SectionLabel extends StatelessWidget {
                     width: 44.w,
                     height: 14.h,
                     decoration: BoxDecoration(
-                      color: isDark
-                          ? const Color(0x44FFFFFF)
-                          : const Color(0x88FCE0CC),
+                      color: const Color(0x88FCE0CC),
                       borderRadius: BorderRadius.circular(2.r),
                       border: Border.all(
                         color: const Color(0x33FFFFFF),

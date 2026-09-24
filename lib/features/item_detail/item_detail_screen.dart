@@ -127,6 +127,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         children: [
           PinnedPhoto(
             item: item,
+            showPin: false,
             aspectRatio: item.photoPath == null ? 2.2 : 4 / 3,
             radius: 22,
             heroTag: 'photo-${item.id}',

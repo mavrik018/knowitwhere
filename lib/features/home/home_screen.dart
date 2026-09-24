@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../app_scope.dart';
 import '../../data/database.dart';
 import '../../theme/app_theme.dart';
@@ -24,6 +24,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _search = TextEditingController();
+  final _searchFocusNode = FocusNode();
   Stream<List<Item>>? _items;
   HomeView _view = HomeView.board;
 
@@ -36,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     _search.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -67,56 +69,74 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final actions = ItemActions(
-      open: (item) => context.push('/item/${item.id}'),
+      open: (item) {
+        _searchFocusNode.unfocus();
+        context.push('/item/${item.id}');
+      },
       delete: _delete,
     );
-    return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: StreamBuilder<List<Item>>(
-          stream: _items,
-          builder: (context, snapshot) {
-            final all = snapshot.data;
-            final query = _search.text.trim();
-            return CustomScrollView(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              slivers: [
-                SliverToBoxAdapter(child: _topBar(context)),
-                if (all == null)
-                  const SliverToBoxAdapter(child: SizedBox.shrink())
-                else if (query.isNotEmpty)
-                  ..._searchSlivers(filterItems(all, query), query, actions)
-                else ...[
-                  SliverToBoxAdapter(child: _header(context)),
-                  if (all.isEmpty)
-                    const SliverToBoxAdapter(child: _EmptyHome())
-                  else ...[
-                    SliverToBoxAdapter(child: _tabs(context, all.length)),
-                    ...switch (_view) {
-                      HomeView.board => boardSlivers(context, all, actions),
-                      HomeView.list => indexSlivers(all, actions),
-                      HomeView.locations => locationSlivers(all, actions),
-                    },
-                  ],
-                  SliverPadding(
-                    padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 0),
-                    sliver: SliverToBoxAdapter(
-                      child: SmartTip(
-                        day: DateTime.now().millisecondsSinceEpoch ~/ 86400000,
-                      ),
-                    ),
-                  ),
-                ],
-                SliverToBoxAdapter(child: SizedBox(height: 100.h)),
-              ],
-            );
-          },
+    return GestureDetector(
+      excludeFromSemantics: true,
+      onTap: () => _searchFocusNode.unfocus(),
+      child: FocusScope(
+        autofocus: false,
+        child: AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle.dark,
+          child: Scaffold(
+            body: SafeArea(
+              bottom: false,
+              child: StreamBuilder<List<Item>>(
+                stream: _items,
+                builder: (context, snapshot) {
+                  final all = snapshot.data;
+                  final query = _search.text.trim();
+                  return CustomScrollView(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    slivers: [
+                      SliverToBoxAdapter(child: _topBar(context)),
+                      if (all == null)
+                        const SliverToBoxAdapter(child: SizedBox.shrink())
+                      else if (query.isNotEmpty)
+                        ..._searchSlivers(filterItems(all, query), query, actions)
+                      else ...[
+                        SliverToBoxAdapter(child: _header(context)),
+                        if (all.isEmpty)
+                          const SliverToBoxAdapter(child: _EmptyHome())
+                        else ...[
+                          SliverToBoxAdapter(child: _tabs(context, all.length)),
+                          ...switch (_view) {
+                            HomeView.board => boardSlivers(context, all, actions),
+                            HomeView.list => indexSlivers(all, actions),
+                            HomeView.locations => locationSlivers(all, actions),
+                          },
+                        ],
+                        SliverPadding(
+                          padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 0),
+                          sliver: SliverToBoxAdapter(
+                            child: SmartTip(
+                              day:
+                                  DateTime.now().millisecondsSinceEpoch ~/ 86400000,
+                            ),
+                          ),
+                        ),
+                      ],
+                      SliverToBoxAdapter(child: SizedBox(height: 100.h)),
+                    ],
+                  );
+                },
+              ),
+            ),
+            floatingActionButton: FloatingActionButton(
+              tooltip: 'Add item',
+              onPressed: () {
+                _searchFocusNode.unfocus();
+                context.push('/add');
+              },
+              child: const Icon(Icons.add_rounded),
+            ),
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: 'Add item',
-        onPressed: () => context.push('/add'),
-        child: const Icon(Icons.add_rounded),
       ),
     );
   }
@@ -132,6 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: TextField(
               controller: _search,
+              focusNode: _searchFocusNode,
               onChanged: (_) => setState(() {}),
               textInputAction: TextInputAction.search,
               decoration: InputDecoration(

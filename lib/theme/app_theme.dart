@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// Warm cream / ink / orange palette, tuned to the squirrel mascot.
 abstract final class AppColors {
   /// Very soft light orange background (replaces grey/cold cream).
-  static const cream = Color(0xFFFFF6EE);
-  static const field = Color(0xFFFDEEE3);
-  static const chip = Color(0xFFF9E5D6);
-  static const line = Color(0xFFF2D9C8);
+  static const cream = Color(0xFFFFF2E6);
+  static const field = Color(0xFFFDE8D8);
+  static const chip = Color(0xFFFCDFCB);
+  static const line = Color(0xFFF4D4BD);
   static const surface = Colors.white;
-  static const ink = Color(0xFF1F1B18);
-  static const muted = Color(0xFF827368);
+  static const ink = Color(0xFF261D17);
+  static const muted = Color(0xFF867265);
 
   /// Fills: buttons, FAB, pins, icons. Pair with white *bold* text only.
   static const orange = Color(0xFFF4632A);
@@ -65,15 +66,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     photoPlaceholder: AppColors.orangeSoft,
   );
 
-  static const dark = AppPalette(
-    field: AppColors.nightField,
-    chip: AppColors.nightField,
-    accentText: Color(0xFFFF9A6B),
-    accentSoft: Color(0xFF4A2F22),
-    tip: Color(0xFF26332A),
-    tipText: Color(0xFFB9D7C2),
-    photoPlaceholder: Color(0xFF3A2C24),
-  );
+  static const dark = light;
 
   @override
   AppPalette copyWith() => this;
@@ -103,24 +96,8 @@ abstract final class AppTheme {
     AppPalette.light,
   );
 
-  static ThemeData dark() => _build(
-    ColorScheme.fromSeed(
-      seedColor: AppColors.orange,
-      brightness: Brightness.dark,
-    ).copyWith(
-      primary: AppColors.orange,
-      onPrimary: Colors.white,
-      secondary: AppColors.cream,
-      onSecondary: AppColors.ink,
-      surface: AppColors.night,
-      onSurface: AppColors.cream,
-      onSurfaceVariant: AppColors.nightMuted,
-      surfaceContainerLowest: AppColors.nightCard,
-      surfaceContainerHighest: AppColors.nightField,
-      outlineVariant: const Color(0xFF3F3A34),
-    ),
-    AppPalette.dark,
-  );
+  /// Always use the light soft orange theme across the app.
+  static ThemeData dark() => light();
 
   static ThemeData _build(ColorScheme scheme, AppPalette palette) {
     final base = ThemeData(
@@ -212,6 +189,7 @@ abstract final class AppTheme {
         iconTheme: IconThemeData(size: 22.r, color: scheme.onSurface),
         actionsIconTheme: IconThemeData(size: 22.r, color: scheme.onSurface),
         titleTextStyle: text.titleMedium?.copyWith(color: scheme.onSurface),
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
       cardTheme: CardThemeData(
         color: scheme.surfaceContainerLowest,

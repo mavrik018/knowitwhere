@@ -26,7 +26,6 @@ class ItemBoardCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final photoPath = item.photoPath;
     final palette = AppPalette.of(context);
 
@@ -61,10 +60,10 @@ class ItemBoardCard extends StatelessWidget {
               // Polaroid card container
               DecoratedBox(
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF2C2723) : Colors.white,
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(6.r),
                   border: Border.all(
-                    color: isDark ? const Color(0x33FFFFFF) : const Color(0x1F000000),
+                    color: const Color(0x1F000000),
                     width: 0.8,
                   ),
                   boxShadow: _polaroidShadow(theme),
@@ -105,9 +104,7 @@ class ItemBoardCard extends StatelessWidget {
                                     fontFamily: 'Poppins',
                                     fontSize: 16.sp,
                                     fontWeight: FontWeight.w600,
-                                    color: isDark
-                                        ? const Color(0xFFF1ECE4)
-                                        : const Color(0xFF2E2925),
+                                    color: const Color(0xFF2E2925),
                                     height: 1.25,
                                     letterSpacing: -0.2,
                                   ),
@@ -121,9 +118,7 @@ class ItemBoardCard extends StatelessWidget {
                                     fontFamily: 'Poppins',
                                     fontSize: 13.5.sp,
                                     fontWeight: FontWeight.w400,
-                                    color: isDark
-                                        ? const Color(0xFFB7AFA5)
-                                        : const Color(0xFF827368),
+                                    color: const Color(0xFF827368),
                                     height: 1.3,
                                   ),
                                 ),

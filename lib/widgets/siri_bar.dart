@@ -19,21 +19,21 @@ class SiriBar extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: AppColors.nightCard,
+          color: AppColors.sage,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: const Color(0xFF3A342E)),
+          border: Border.all(color: const Color(0xFFC6DACB)),
         ),
         child: Row(
           children: [
-            const Icon(Icons.mic_none_rounded, color: AppColors.orange),
+            const Icon(Icons.mic_none_rounded, color: AppColors.sageInk),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 '“$phrase”',
                 style: const TextStyle(
-                  color: Color(0xFFF1ECE4),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
+                  color: AppColors.sageInk,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),

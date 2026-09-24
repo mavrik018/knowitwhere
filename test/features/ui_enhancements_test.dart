@@ -193,10 +193,18 @@ void main() {
 
     test('AppTheme light mode uses soft light orange background and Poppins font', () {
       final theme = AppTheme.light();
-      expect(theme.scaffoldBackgroundColor, const Color(0xFFFFF6EE));
+      expect(theme.scaffoldBackgroundColor, const Color(0xFFFFF2E6));
       expect(theme.textTheme.bodyLarge?.fontFamily, 'Poppins');
       expect(theme.textTheme.titleMedium?.fontFamily, 'Poppins');
       expect(theme.textTheme.headlineLarge?.fontFamily, 'Poppins');
+    });
+
+    testWidgets('OnboardingScreen keeps dark background', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(home: OnboardingScreen(onDone: () {})),
+      );
+      final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+      expect(scaffold.backgroundColor, AppColors.night);
     });
 
     testWidgets('ItemBoardCard uses readable Poppins font for name and location', (

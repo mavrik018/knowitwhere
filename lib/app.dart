@@ -125,8 +125,9 @@ class _KnowItWhereAppState extends State<KnowItWhereApp> {
         builder: (context, _) => MaterialApp.router(
           title: 'knowitwhere',
           debugShowCheckedModeBanner: false,
+          themeMode: ThemeMode.light,
           theme: AppTheme.light(),
-          darkTheme: AppTheme.dark(),
+          darkTheme: AppTheme.light(),
           routerConfig: _router,
         ),
       ),

@@ -19,6 +19,7 @@ class PinnedPhoto extends StatelessWidget {
     this.cacheWidth,
     this.semanticLabel,
     this.heroTag,
+    this.showPin = true,
   });
 
   final Item item;
@@ -28,6 +29,7 @@ class PinnedPhoto extends StatelessWidget {
   final int? cacheWidth;
   final String? semanticLabel;
   final Object? heroTag;
+  final bool showPin;
 
   @override
   Widget build(BuildContext context) {
@@ -59,12 +61,13 @@ class PinnedPhoto extends StatelessWidget {
           borderRadius: BorderRadius.circular(radius.r),
           child: AspectRatio(aspectRatio: aspectRatio, child: photo),
         ),
-        Positioned(
-          top: -effectivePinSize.r * 0.42,
-          left: 0,
-          right: 0,
-          child: Center(child: PinDot(size: effectivePinSize)),
-        ),
+        if (showPin)
+          Positioned(
+            top: -effectivePinSize.r * 0.42,
+            left: 0,
+            right: 0,
+            child: Center(child: PinDot(size: effectivePinSize)),
+          ),
       ],
     );
   }
