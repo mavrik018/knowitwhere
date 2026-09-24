@@ -19,6 +19,20 @@ class NoopItemChangeSink implements ItemChangeSink {
   Future<void> onItemsChanged(List<Item> items) async {}
 }
 
+/// Fans a change out to several sinks, in order.
+class CompositeItemChangeSink implements ItemChangeSink {
+  const CompositeItemChangeSink(this.sinks);
+
+  final List<ItemChangeSink> sinks;
+
+  @override
+  Future<void> onItemsChanged(List<Item> items) async {
+    for (final sink in sinks) {
+      await sink.onItemsChanged(items);
+    }
+  }
+}
+
 class ItemRepository {
   ItemRepository(
     this._db, {
