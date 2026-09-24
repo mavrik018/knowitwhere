@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -177,7 +178,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
     return Form(
       key: _formKey,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+        padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 32.h),
         children: [
           TextFormField(
             controller: _name,
@@ -191,7 +192,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
             ),
             validator: (v) => _required(v, 'Give it a name'),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 12.h),
           TextFormField(
             controller: _location,
             textCapitalization: TextCapitalization.sentences,
@@ -204,7 +205,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
             ),
             validator: (v) => _required(v, 'Where did you put it?'),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 16.h),
           _PhotoField(
             file: _pickedPath != null
                 ? File(_pickedPath!)
@@ -214,7 +215,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
             onPick: _pickPhoto,
             onRemove: _removePhoto,
           ),
-          const SizedBox(height: 28),
+          SizedBox(height: 24.h),
           FilledButton(
             onPressed: _saving ? null : _save,
             child: Text(_isEdit ? 'Save changes' : 'Save item'),
@@ -249,17 +250,17 @@ class _PhotoField extends StatelessWidget {
         excludeSemantics: true,
         child: Material(
           color: palette.accentSoft,
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(22.r),
           child: InkWell(
             onTap: onPick,
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(22.r),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 26, horizontal: 16),
+              padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 16.w),
               child: Column(
                 children: [
                   Container(
-                    width: 52,
-                    height: 52,
+                    width: 44.r,
+                    height: 44.r,
                     decoration: const BoxDecoration(
                       color: AppColors.orange,
                       shape: BoxShape.circle,
@@ -269,7 +270,7 @@ class _PhotoField extends StatelessWidget {
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10.h),
                   Text(
                     'Add a photo (optional)',
                     textAlign: TextAlign.center,
@@ -278,7 +279,7 @@ class _PhotoField extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2.h),
                   Text(
                     'A quick shot of the spot helps later',
                     textAlign: TextAlign.center,
@@ -297,13 +298,13 @@ class _PhotoField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ClipRRect(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(22.r),
           child: AspectRatio(
             aspectRatio: 4 / 3,
             child: ItemPhoto(file: file, semanticLabel: 'Selected photo'),
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [

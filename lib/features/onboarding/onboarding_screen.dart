@@ -20,43 +20,69 @@ class OnboardingScreen extends StatelessWidget {
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
         backgroundColor: AppColors.night,
-        body: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, viewport) {
-              final height = viewport.maxHeight;
-              // Scale the hero to the screen so small phones fit without
-              // scrolling; very large text still scrolls.
-              final titleSize = (height * 0.075).clamp(44.0, 64.0);
-              final stageHeight = (height * 0.47).clamp(220.0, 460.0);
-              return SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: height),
-                  child: IntrinsicHeight(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _HeroTitle(fontSize: titleSize),
-                          const Spacer(),
-                          SizedBox(
-                            height: stageHeight,
-                            child: const _MascotStage(),
+        // Onboarding keeps its own fixed look: pin the inherited text and
+        // icon defaults so app-wide theme (ScreenUtil) sizes don't leak in.
+        body: DefaultTextStyle.merge(
+          style: const TextStyle(
+            fontSize: 14,
+            height: 1.43,
+            letterSpacing: 0.25,
+          ),
+          child: IconTheme.merge(
+            data: const IconThemeData(size: 24),
+            child: SafeArea(
+              child: LayoutBuilder(
+                builder: (context, viewport) {
+                  final height = viewport.maxHeight;
+                  // Scale the hero to the screen so small phones fit without
+                  // scrolling; very large text still scrolls.
+                  final titleSize = (height * 0.075).clamp(44.0, 64.0);
+                  final stageHeight = (height * 0.47).clamp(220.0, 460.0);
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: height),
+                      child: IntrinsicHeight(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _HeroTitle(fontSize: titleSize),
+                              const Spacer(),
+                              SizedBox(
+                                height: stageHeight,
+                                child: const _MascotStage(),
+                              ),
+                              const SizedBox(height: 12),
+                              const SiriBar(),
+                              const SizedBox(height: 14),
+                              FilledButton(
+                                onPressed: onDone,
+                                // Pinned so theme changes don't alter onboarding.
+                                style: FilledButton.styleFrom(
+                                  minimumSize: const Size.fromHeight(56),
+                                  textStyle: Theme.of(context)
+                                      .textTheme
+                                      .labelLarge
+                                      ?.copyWith(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(18),
+                                  ),
+                                ),
+                                child: const Text('Get started'),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 12),
-                          const SiriBar(),
-                          const SizedBox(height: 14),
-                          FilledButton(
-                            onPressed: onDone,
-                            child: const Text('Get started'),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              );
-            },
+                  );
+                },
+              ),
+            ),
           ),
         ),
       ),
