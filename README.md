@@ -43,7 +43,7 @@ Work is tracked as GitHub issues grouped by milestone (one milestone per phase).
 
 ## Development
 
-Requires Flutter 3.44.x (Dart 3.12).
+Requires Flutter 3.44.x (Dart 3.12). The app targets iOS 17+ (App Intents, current WidgetKit APIs).
 
 ```bash
 flutter pub get
