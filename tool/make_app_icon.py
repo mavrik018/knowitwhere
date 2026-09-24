@@ -1,6 +1,6 @@
 """Draws the knowitwhere app icon and writes every size in AppIcon.appiconset.
 
-A green map pin holding a small storage box, on the app's cream background.
+An orange map pin holding a small storage box, on the app's cream background.
 Run from the repo root:  python tool/make_app_icon.py
 Requires Pillow.
 """
@@ -10,9 +10,9 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-CREAM = (0xF6, 0xF1, 0xE7)
-GREEN = (0x3E, 0x7B, 0x57)
-CHARCOAL = (0x2A, 0x2A, 0x2A)
+CREAM = (0xFB, 0xF8, 0xF2)
+ORANGE = (0xF4, 0x63, 0x2A)
+INK = (0x1F, 0x1B, 0x18)
 
 ICONSET = Path("ios/Runner/Assets.xcassets/AppIcon.appiconset")
 MASTER = 4096  # drawn large, then downsampled for smooth edges
@@ -29,8 +29,8 @@ def draw_master() -> Image.Image:
     tip_y = s * 0.86
     dist = tip_y - cy
     tx, ty = r * (1 - (r / dist) ** 2) ** 0.5, r * r / dist
-    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=GREEN)
-    d.polygon([(cx - tx, cy + ty), (cx + tx, cy + ty), (cx, tip_y)], fill=GREEN)
+    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=ORANGE)
+    d.polygon([(cx - tx, cy + ty), (cx + tx, cy + ty), (cx, tip_y)], fill=ORANGE)
 
     # Cream disc inside the pin head.
     inner = r * 0.62
@@ -44,12 +44,12 @@ def draw_master() -> Image.Image:
     d.rounded_rectangle(
         [cx - bw / 2, top + lid_h * 0.55, cx + bw / 2, top + bh],
         radius=radius,
-        fill=CHARCOAL,
+        fill=INK,
     )
     d.rounded_rectangle(
         [cx - bw * 0.58, top, cx + bw * 0.58, top + lid_h],
         radius=radius,
-        fill=CHARCOAL,
+        fill=INK,
     )
     slot_w, slot_h = bw * 0.36, bh * 0.1
     slot_y = top + lid_h + (bh - lid_h) * 0.32

@@ -67,7 +67,9 @@ lib/
   data/                 Drift DB, Item model, repository, photo storage
   platform/             App Group shared cache, deep-link routing
   features/             home (search + list), item_form (add/edit), item_detail
-  theme/                cream / charcoal / green theme
+  features/onboarding/  first-launch hero ("Never lose it again")
+  theme/                cream / ink / orange theme
+assets/images/          mascot (cut out by tool/cut_out_mascot.py)
 docs/SRS.md             requirements
 ```
 
@@ -93,6 +95,7 @@ Extensions only read this — the Drift database stays private to the app.
 
 ### Docs
 
+- [Screen previews](docs/screens): rendered by `flutter test tool/screenshots/screenshots_test.dart --update-goldens`
 - [Siri voice UX](docs/siri-voice-ux.md): phrases, spoken copy, matching
 - [Phase 4 Xcode setup](docs/phase-4-xcode-setup.md): adding the widget and Siri targets on a Mac
 - [App Store submission](docs/app-store.md): listing, keywords, privacy, reviewer notes

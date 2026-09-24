@@ -112,7 +112,7 @@ public struct ItemsWidgetView: View {
     HStack {
       Text("knowitwhere")
         .font(.caption.weight(.semibold))
-        .foregroundStyle(palette.accent)
+        .foregroundStyle(palette.accentText)
       Spacer()
       Image(systemName: "plus")
         .font(.caption.weight(.semibold))
@@ -176,24 +176,29 @@ private struct CompactLabelStyle: LabelStyle {
   }
 }
 
-/// Cream / charcoal / green, matching the app theme (lib/theme/app_theme.dart).
+/// Cream / ink / orange, matching the app theme (lib/theme/app_theme.dart).
 struct Palette {
   let background: Color
   let text: Color
   let secondary: Color
+  /// Icons and fills.
   let accent: Color
+  /// Orange for small text, dark enough to read on cream.
+  let accentText: Color
 
   init(_ scheme: ColorScheme) {
     if scheme == .dark {
-      background = Color(red: 0x1C / 255, green: 0x1C / 255, blue: 0x1B / 255)
-      text = Color(red: 0xF6 / 255, green: 0xF1 / 255, blue: 0xE7 / 255)
-      secondary = Color(red: 0xB8 / 255, green: 0xB3 / 255, blue: 0xA8 / 255)
-      accent = Color(red: 0x8C / 255, green: 0xC3 / 255, blue: 0xA1 / 255)
+      background = Color(red: 0x1F / 255, green: 0x1B / 255, blue: 0x18 / 255)
+      text = Color(red: 0xFB / 255, green: 0xF8 / 255, blue: 0xF2 / 255)
+      secondary = Color(red: 0xB7 / 255, green: 0xAF / 255, blue: 0xA5 / 255)
+      accent = Color(red: 0xF4 / 255, green: 0x63 / 255, blue: 0x2A / 255)
+      accentText = Color(red: 0xFF / 255, green: 0x9A / 255, blue: 0x6B / 255)
     } else {
-      background = Color(red: 0xF6 / 255, green: 0xF1 / 255, blue: 0xE7 / 255)
-      text = Color(red: 0x2A / 255, green: 0x2A / 255, blue: 0x2A / 255)
-      secondary = Color(red: 0x5C / 255, green: 0x5A / 255, blue: 0x55 / 255)
-      accent = Color(red: 0x3E / 255, green: 0x7B / 255, blue: 0x57 / 255)
+      background = Color(red: 0xFB / 255, green: 0xF8 / 255, blue: 0xF2 / 255)
+      text = Color(red: 0x1F / 255, green: 0x1B / 255, blue: 0x18 / 255)
+      secondary = Color(red: 0x78 / 255, green: 0x72 / 255, blue: 0x6B / 255)
+      accent = Color(red: 0xF4 / 255, green: 0x63 / 255, blue: 0x2A / 255)
+      accentText = Color(red: 0xB4 / 255, green: 0x43 / 255, blue: 0x0F / 255)
     }
   }
 }

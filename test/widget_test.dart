@@ -10,6 +10,8 @@ import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'test_helpers.dart';
+
 void main() {
   late AppDatabase db;
   late ItemRepository repo;
@@ -34,6 +36,7 @@ void main() {
   });
 
   Future<void> pumpApp(WidgetTester tester) async {
+    usePhoneScreen(tester);
     await tester.pumpWidget(KnowItWhereApp(repository: repo, photos: photos));
     await tester.pumpAndSettle();
   }
@@ -47,17 +50,17 @@ void main() {
   testWidgets('adds an item through the form and lists it', (tester) async {
     await pumpApp(tester);
 
-    await tester.tap(find.text('Add item'));
+    await tester.tap(find.byTooltip('Add item'));
     await tester.pumpAndSettle();
 
     // Validation blocks an empty save.
-    await tester.tap(find.text('Save item'));
+    await scrollAndTap(tester, find.text('Save item'));
     await tester.pumpAndSettle();
     expect(find.text('Give it a name'), findsOneWidget);
 
     await tester.enterText(find.byType(TextFormField).at(0), 'Passport');
     await tester.enterText(find.byType(TextFormField).at(1), 'Desk drawer');
-    await tester.tap(find.text('Save item'));
+    await scrollAndTap(tester, find.text('Save item'));
     await tester.pumpAndSettle();
 
     expect(find.text('Nothing stored yet'), findsNothing);
@@ -87,7 +90,7 @@ void main() {
     await repo.add(name: 'Keys', location: 'Hook');
     await pumpApp(tester);
 
-    await tester.tap(find.text('Keys'));
+    await scrollAndTap(tester, find.text('Keys'));
     await tester.pumpAndSettle();
     expect(find.text('Stored in'), findsOneWidget);
     expect(find.text('Hook'), findsOneWidget);
@@ -95,7 +98,7 @@ void main() {
     await tester.tap(find.byTooltip('Edit'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextFormField).at(1), 'Bowl by door');
-    await tester.tap(find.text('Save changes'));
+    await scrollAndTap(tester, find.text('Save changes'));
     await tester.pumpAndSettle();
 
     expect(find.text('Bowl by door'), findsOneWidget);
@@ -106,7 +109,7 @@ void main() {
     await repo.add(name: 'Keys', location: 'Hook');
     await pumpApp(tester);
 
-    await tester.tap(find.text('Keys'));
+    await scrollAndTap(tester, find.text('Keys'));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Delete'));
     await tester.pumpAndSettle();
@@ -129,7 +132,7 @@ void main() {
 
     expect(find.byType(Image), findsOneWidget);
 
-    await tester.tap(find.text('Tent'));
+    await scrollAndTap(tester, find.text('Tent'));
     await tester.pumpAndSettle();
     expect(find.bySemanticsLabel('Photo of Tent'), findsOneWidget);
   });
@@ -138,6 +141,7 @@ void main() {
     final item = await repo.add(name: 'Passport', location: 'Desk drawer');
     final links = StreamController<Uri>();
     addTearDown(links.close);
+    usePhoneScreen(tester);
     await tester.pumpWidget(
       KnowItWhereApp(repository: repo, photos: photos, deepLinks: links.stream),
     );
@@ -155,5 +159,55 @@ void main() {
     links.add(Uri.parse('knowitwhere://nope'));
     await tester.pumpAndSettle();
     expect(find.text('Save item'), findsOneWidget);
+  });
+
+  testWidgets('first launch shows onboarding until Get started', (
+    tester,
+  ) async {
+    var done = false;
+    usePhoneScreen(tester);
+    await tester.pumpWidget(
+      KnowItWhereApp(
+        repository: repo,
+        photos: photos,
+        showOnboarding: true,
+        onOnboardingDone: () => done = true,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.bySemanticsLabel('Never lose it again'), findsOneWidget);
+    expect(
+      find.textContaining('where’s my passport in knowitwhere'),
+      findsOneWidget,
+    );
+
+    await scrollAndTap(tester, find.text('Get started'));
+    expect(done, isTrue);
+    expect(find.text('Nothing stored yet'), findsOneWidget);
+  });
+
+  testWidgets('Index and Locations tabs list items', (tester) async {
+    await repo.add(name: 'Tent', location: 'Loft');
+    await repo.add(name: 'Tape', location: 'loft');
+    final handle = tester.ensureSemantics();
+    await pumpApp(tester);
+
+    await tester.tap(find.text('Index'));
+    await tester.pumpAndSettle();
+    expect(find.text('T'), findsOneWidget);
+    expect(find.text('Tape'), findsOneWidget);
+    expect(find.text('Tent'), findsOneWidget);
+
+    // The tab row scrolls sideways on narrow screens.
+    await tester.ensureVisible(find.text('Locations'));
+    await tester.tap(find.text('Locations'));
+    await tester.pumpAndSettle();
+    // Both spellings merge into one group of two.
+    expect(
+      find.bySemanticsLabel(RegExp(r'^loft, 2 items$', caseSensitive: false)),
+      findsOneWidget,
+    );
+    handle.dispose();
   });
 }

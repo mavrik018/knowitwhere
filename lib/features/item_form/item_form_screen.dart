@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../app_scope.dart';
 import '../../data/database.dart';
+import '../../theme/app_theme.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/item_photo.dart';
 
@@ -241,16 +242,54 @@ class _PhotoField extends StatelessWidget {
     final theme = Theme.of(context);
     final file = this.file;
     if (file == null) {
-      return OutlinedButton.icon(
-        onPressed: onPick,
-        icon: const Icon(Icons.add_a_photo_outlined),
-        label: const Text('Add a photo (optional)'),
-        style: OutlinedButton.styleFrom(
-          minimumSize: const Size.fromHeight(96),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+      final palette = AppPalette.of(context);
+      return Semantics(
+        button: true,
+        label: 'Add a photo (optional)',
+        excludeSemantics: true,
+        child: Material(
+          color: palette.accentSoft,
+          borderRadius: BorderRadius.circular(22),
+          child: InkWell(
+            onTap: onPick,
+            borderRadius: BorderRadius.circular(22),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 26, horizontal: 16),
+              child: Column(
+                children: [
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: const BoxDecoration(
+                      color: AppColors.orange,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.add_a_photo_outlined,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Add a photo (optional)',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: palette.accentText,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'A quick shot of the spot helps later',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          side: BorderSide(color: theme.colorScheme.outlineVariant),
         ),
       );
     }
@@ -258,7 +297,7 @@ class _PhotoField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(22),
           child: AspectRatio(
             aspectRatio: 4 / 3,
             child: ItemPhoto(file: file, semanticLabel: 'Selected photo'),

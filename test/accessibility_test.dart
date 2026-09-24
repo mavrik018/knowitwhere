@@ -11,6 +11,8 @@ import 'package:knowitwhere/data/item_repository.dart';
 import 'package:knowitwhere/data/photo_store.dart';
 import 'package:knowitwhere/features/home/item_card.dart';
 
+import 'test_helpers.dart';
+
 /// SRS §7 accessibility: Dynamic Type on every screen, VoiceOver labels on
 /// list rows and the Add/Edit form. Layout overflows fail these tests.
 void main() {
@@ -37,19 +39,35 @@ void main() {
   });
 
   /// iPhone SE (3rd gen) logical size, the smallest supported screen.
-  Future<void> pumpSmallScreen(WidgetTester tester, double textScale) async {
+  Future<void> pumpSmallScreen(
+    WidgetTester tester,
+    double textScale, {
+    bool onboarding = false,
+  }) async {
     tester.view.physicalSize = const Size(750, 1334);
     tester.view.devicePixelRatio = 2;
     tester.platformDispatcher.textScaleFactorTestValue = textScale;
     addTearDown(tester.view.reset);
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-    await tester.pumpWidget(KnowItWhereApp(repository: repo, photos: photos));
+    await tester.pumpWidget(
+      KnowItWhereApp(
+        repository: repo,
+        photos: photos,
+        showOnboarding: onboarding,
+      ),
+    );
     await tester.pumpAndSettle();
   }
 
   // 3.1x is roughly iOS's largest accessibility text size (AX5).
   for (final scale in [1.0, 2.0, 3.1]) {
     group('text scale $scale', () {
+      testWidgets('onboarding fits and can be finished', (tester) async {
+        await pumpSmallScreen(tester, scale, onboarding: true);
+        await scrollAndTap(tester, find.text('Get started'));
+        expect(find.text('Nothing stored yet'), findsOneWidget);
+      });
+
       testWidgets('empty home fits', (tester) async {
         await pumpSmallScreen(tester, scale);
         expect(find.text('Nothing stored yet'), findsOneWidget);
@@ -62,6 +80,7 @@ void main() {
         );
         await repo.add(name: 'Keys', location: 'Hook');
         await pumpSmallScreen(tester, scale);
+        await scrollTo(tester, find.text('Keys'));
         expect(find.text('Keys'), findsOneWidget);
       });
 
@@ -75,10 +94,10 @@ void main() {
 
       testWidgets('add form fits, including validation errors', (tester) async {
         await pumpSmallScreen(tester, scale);
-        await tester.tap(find.byType(FloatingActionButton));
+        await tester.tap(find.byTooltip('Add item'));
         await tester.pumpAndSettle();
-        await tester.tap(find.text('Save item'));
-        await tester.pumpAndSettle();
+        await scrollAndTap(tester, find.text('Save item'));
+        await scrollTo(tester, find.text('Give it a name'), delta: -200);
         expect(find.text('Give it a name'), findsOneWidget);
       });
 
@@ -90,8 +109,8 @@ void main() {
               'vacuum bag under the spare pillows',
         );
         await pumpSmallScreen(tester, scale);
-        await tester.tap(find.text('Winter duvet'));
-        await tester.pumpAndSettle();
+        await scrollAndTap(tester, find.text('Winter duvet'));
+        await scrollTo(tester, find.text('Stored in'));
         expect(find.text('Stored in'), findsOneWidget);
       });
     });
@@ -134,7 +153,7 @@ void main() {
     final handle = tester.ensureSemantics();
     await pumpSmallScreen(tester, 1);
 
-    await tester.tap(find.text('Keys'));
+    await scrollAndTap(tester, find.text('Keys'));
     await tester.pumpAndSettle();
     // Icon buttons are announced via their tooltip.
     for (final action in ['Edit', 'Delete']) {
@@ -156,6 +175,18 @@ void main() {
     await repo.add(name: 'Passport', location: 'Desk drawer');
     final handle = tester.ensureSemantics();
     await pumpSmallScreen(tester, 1);
+
+    await expectLater(tester, meetsGuideline(iOSTapTargetGuideline));
+    await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+    await expectLater(tester, meetsGuideline(textContrastGuideline));
+    handle.dispose();
+  });
+
+  testWidgets('onboarding meets Flutter accessibility guidelines', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    await pumpSmallScreen(tester, 1, onboarding: true);
 
     await expectLater(tester, meetsGuideline(iOSTapTargetGuideline));
     await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));

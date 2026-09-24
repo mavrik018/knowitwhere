@@ -9,12 +9,27 @@ import 'data/photo_store.dart';
 import 'features/home/home_screen.dart';
 import 'features/item_detail/item_detail_screen.dart';
 import 'features/item_form/item_form_screen.dart';
+import 'features/onboarding/onboarding_screen.dart';
 import 'platform/deep_links.dart';
 import 'theme/app_theme.dart';
 
 /// Routes mirror the Phase 3 deep links: `knowitwhere://add`, `knowitwhere://item/{id}`.
-GoRouter buildRouter() => GoRouter(
+/// `/welcome` is the first-launch onboarding.
+GoRouter buildRouter({
+  String initialLocation = '/',
+  VoidCallback? onOnboardingDone,
+}) => GoRouter(
+  initialLocation: initialLocation,
   routes: [
+    GoRoute(
+      path: '/welcome',
+      builder: (context, state) => OnboardingScreen(
+        onDone: () {
+          onOnboardingDone?.call();
+          context.go('/');
+        },
+      ),
+    ),
     GoRoute(
       path: '/',
       builder: (context, state) => const HomeScreen(),
@@ -46,6 +61,8 @@ class KnowItWhereApp extends StatefulWidget {
     required this.repository,
     required this.photos,
     this.deepLinks,
+    this.showOnboarding = false,
+    this.onOnboardingDone,
   });
 
   final ItemRepository repository;
@@ -54,12 +71,21 @@ class KnowItWhereApp extends StatefulWidget {
   /// Incoming `knowitwhere://` links, including the one that launched the app.
   final Stream<Uri>? deepLinks;
 
+  /// First launch: start on the onboarding screen.
+  final bool showOnboarding;
+
+  /// Called when onboarding is finished, to remember it.
+  final VoidCallback? onOnboardingDone;
+
   @override
   State<KnowItWhereApp> createState() => _KnowItWhereAppState();
 }
 
 class _KnowItWhereAppState extends State<KnowItWhereApp> {
-  final _router = buildRouter();
+  late final _router = buildRouter(
+    initialLocation: widget.showOnboarding ? '/welcome' : '/',
+    onOnboardingDone: widget.onOnboardingDone,
+  );
   StreamSubscription<Uri>? _deepLinkSub;
 
   @override
