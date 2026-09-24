@@ -1,30 +1,108 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+import 'package:discoverly/app.dart';
+import 'package:discoverly/data/database.dart';
+import 'package:discoverly/data/item_repository.dart';
+import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:discoverly/main.dart';
-
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  late AppDatabase db;
+  late ItemRepository repo;
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  setUp(() {
+    db = AppDatabase(
+      DatabaseConnection(
+        NativeDatabase.memory(),
+        closeStreamsSynchronously: true,
+      ),
+    );
+    repo = ItemRepository(db);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  tearDown(() => db.close());
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  Future<void> pumpApp(WidgetTester tester) async {
+    await tester.pumpWidget(WdipitApp(repository: repo));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('shows the empty state when nothing is stored', (tester) async {
+    await pumpApp(tester);
+
+    expect(find.text('Nothing stored yet'), findsOneWidget);
+  });
+
+  testWidgets('adds an item through the form and lists it', (tester) async {
+    await pumpApp(tester);
+
+    await tester.tap(find.text('Add item'));
+    await tester.pumpAndSettle();
+
+    // Validation blocks an empty save.
+    await tester.tap(find.text('Save item'));
+    await tester.pumpAndSettle();
+    expect(find.text('Give it a name'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextFormField).at(0), 'Passport');
+    await tester.enterText(find.byType(TextFormField).at(1), 'Desk drawer');
+    await tester.tap(find.text('Save item'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Nothing stored yet'), findsNothing);
+    expect(find.text('Passport'), findsOneWidget);
+    expect(find.text('Desk drawer'), findsOneWidget);
+  });
+
+  testWidgets('search filters live and shows a distinct no-results state', (
+    tester,
+  ) async {
+    await repo.add(name: 'Passport', location: 'Desk drawer');
+    await repo.add(name: 'HDMI cable', location: 'TV cabinet');
+    await pumpApp(tester);
+
+    await tester.enterText(find.byType(TextField), 'hdmi');
+    await tester.pumpAndSettle();
+    expect(find.text('HDMI cable'), findsOneWidget);
+    expect(find.text('Passport'), findsNothing);
+
+    await tester.enterText(find.byType(TextField), 'umbrella');
+    await tester.pumpAndSettle();
+    expect(find.text('No match for "umbrella"'), findsOneWidget);
+    expect(find.text('Nothing stored yet'), findsNothing);
+  });
+
+  testWidgets('detail shows the location and edit updates it', (tester) async {
+    await repo.add(name: 'Keys', location: 'Hook');
+    await pumpApp(tester);
+
+    await tester.tap(find.text('Keys'));
+    await tester.pumpAndSettle();
+    expect(find.text('Stored in'), findsOneWidget);
+    expect(find.text('Hook'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Edit'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextFormField).at(1), 'Bowl by door');
+    await tester.tap(find.text('Save changes'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Bowl by door'), findsOneWidget);
+    expect((await repo.getAll()).single.location, 'Bowl by door');
+  });
+
+  testWidgets('delete from detail removes the item', (tester) async {
+    await repo.add(name: 'Keys', location: 'Hook');
+    await pumpApp(tester);
+
+    await tester.tap(find.text('Keys'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Delete'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(TextButton, 'Delete'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Nothing stored yet'), findsOneWidget);
+    expect(await repo.getAll(), isEmpty);
   });
 }
