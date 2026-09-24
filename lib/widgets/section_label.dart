@@ -30,17 +30,17 @@ class SectionLabel extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isDark
                       ? const Color(0xFF38322B)
-                      : const Color(0xFFEDE3D0),
+                      : const Color(0xFFFDEEE3),
                   borderRadius: BorderRadius.circular(5.r),
                   border: Border.all(
                     color: isDark
                         ? const Color(0x33FFFFFF)
-                        : const Color(0x1F000000),
+                        : const Color(0xFFF2D9C8),
                     width: 0.8,
                   ),
                   boxShadow: const [
                     BoxShadow(
-                      color: Color(0x12000000),
+                      color: Color(0x0E000000),
                       blurRadius: 4,
                       offset: Offset(0, 2),
                     ),
@@ -54,18 +54,13 @@ class SectionLabel extends StatelessWidget {
                   child: Text(
                     label.toUpperCase(),
                     style: TextStyle(
-                      fontFamilyFallback: const [
-                        'Courier New',
-                        'Courier',
-                        'Menlo',
-                        'monospace',
-                      ],
+                      fontFamily: 'Poppins',
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w700,
-                      letterSpacing: 1.4,
+                      letterSpacing: 1.2,
                       color: isDark
-                          ? const Color(0xFFE2D8CA)
-                          : const Color(0xFF52483C),
+                          ? const Color(0xFFF1ECE4)
+                          : const Color(0xFF5D4638),
                     ),
                   ),
                 ),
@@ -82,7 +77,7 @@ class SectionLabel extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: isDark
                           ? const Color(0x44FFFFFF)
-                          : const Color(0x88E8DECD),
+                          : const Color(0x88FCE0CC),
                       borderRadius: BorderRadius.circular(2.r),
                       border: Border.all(
                         color: const Color(0x33FFFFFF),

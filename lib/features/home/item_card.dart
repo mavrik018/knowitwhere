@@ -23,17 +23,6 @@ class ItemBoardCard extends StatelessWidget {
   final VoidCallback? onDelete;
   final double tiltAngle;
 
-  static const _handwrittenFonts = [
-    'Noteworthy',
-    'Marker Felt',
-    'Chalkboard SE',
-    'Bradley Hand',
-    'Segoe Print',
-    'Ink Free',
-    'Caveat',
-    'cursive',
-  ];
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -72,14 +61,10 @@ class ItemBoardCard extends StatelessWidget {
               // Polaroid card container
               DecoratedBox(
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? const Color(0xFF2C2723)
-                      : const Color(0xFFFAF7EE),
+                  color: isDark ? const Color(0xFF2C2723) : Colors.white,
                   borderRadius: BorderRadius.circular(6.r),
                   border: Border.all(
-                    color: isDark
-                        ? const Color(0x33FFFFFF)
-                        : const Color(0x1F000000),
+                    color: isDark ? const Color(0x33FFFFFF) : const Color(0x1F000000),
                     width: 0.8,
                   ),
                   boxShadow: _polaroidShadow(theme),
@@ -106,7 +91,7 @@ class ItemBoardCard extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 10.h),
-                          // Polaroid bottom chin: handwritten note area
+                          // Polaroid bottom chin: clean readable Poppins text
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 4.w),
                             child: Column(
@@ -117,13 +102,13 @@ class ItemBoardCard extends StatelessWidget {
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    fontFamilyFallback: _handwrittenFonts,
-                                    fontSize: 17.sp,
-                                    fontWeight: FontWeight.w700,
+                                    fontFamily: 'Poppins',
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.w600,
                                     color: isDark
                                         ? const Color(0xFFF1ECE4)
                                         : const Color(0xFF2E2925),
-                                    height: 1.2,
+                                    height: 1.25,
                                     letterSpacing: -0.2,
                                   ),
                                 ),
@@ -133,14 +118,13 @@ class ItemBoardCard extends StatelessWidget {
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                    fontFamilyFallback: _handwrittenFonts,
-                                    fontSize: 15.sp,
-                                    fontStyle: FontStyle.italic,
-                                    fontWeight: FontWeight.w500,
+                                    fontFamily: 'Poppins',
+                                    fontSize: 13.5.sp,
+                                    fontWeight: FontWeight.w400,
                                     color: isDark
                                         ? const Color(0xFFB7AFA5)
-                                        : const Color(0xFF6B655D),
-                                    height: 1.25,
+                                        : const Color(0xFF827368),
+                                    height: 1.3,
                                   ),
                                 ),
                               ],

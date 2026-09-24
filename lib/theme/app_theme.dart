@@ -3,13 +3,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// Warm cream / ink / orange palette, tuned to the squirrel mascot.
 abstract final class AppColors {
-  static const cream = Color(0xFFFBF8F2);
-  static const field = Color(0xFFF3EFE7);
-  static const chip = Color(0xFFEFEAE1);
-  static const line = Color(0xFFE7E1D6);
+  /// Very soft light orange background (replaces grey/cold cream).
+  static const cream = Color(0xFFFFF6EE);
+  static const field = Color(0xFFFDEEE3);
+  static const chip = Color(0xFFF9E5D6);
+  static const line = Color(0xFFF2D9C8);
   static const surface = Colors.white;
   static const ink = Color(0xFF1F1B18);
-  static const muted = Color(0xFF78726B);
+  static const muted = Color(0xFF827368);
 
   /// Fills: buttons, FAB, pins, icons. Pair with white *bold* text only.
   static const orange = Color(0xFFF4632A);
@@ -122,7 +123,11 @@ abstract final class AppTheme {
   );
 
   static ThemeData _build(ColorScheme scheme, AppPalette palette) {
-    final base = ThemeData(colorScheme: scheme, useMaterial3: true);
+    final base = ThemeData(
+      colorScheme: scheme,
+      fontFamily: 'Poppins',
+      useMaterial3: true,
+    );
     final t = base.textTheme;
     // iOS Human Interface Guidelines sizes at the default text setting,
     // scaled from the 411×914 design with .sp. Dynamic Type still applies
@@ -134,6 +139,7 @@ abstract final class AppTheme {
       double? height,
       double letterSpacing = 0,
     }) => s?.copyWith(
+      fontFamily: 'Poppins',
       fontSize: size.sp,
       fontWeight: weight,
       height: height,

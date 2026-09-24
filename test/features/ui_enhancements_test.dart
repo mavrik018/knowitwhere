@@ -9,8 +9,10 @@ import 'package:knowitwhere/app.dart';
 import 'package:knowitwhere/data/database.dart';
 import 'package:knowitwhere/data/item_repository.dart';
 import 'package:knowitwhere/data/photo_store.dart';
+import 'package:knowitwhere/features/home/item_card.dart';
 import 'package:knowitwhere/features/home/smart_tip.dart';
 import 'package:knowitwhere/features/onboarding/onboarding_screen.dart';
+import 'package:knowitwhere/theme/app_theme.dart';
 import 'package:knowitwhere/widgets/pinned_photo.dart';
 import 'package:knowitwhere/widgets/section_label.dart';
 import 'package:knowitwhere/widgets/siri_bar.dart';
@@ -178,11 +180,62 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: SectionLabel('Recent (This Week)', count: 2)),
+        ScreenUtilInit(
+          designSize: designSize,
+          builder: (context, _) => const MaterialApp(
+            home: Scaffold(body: SectionLabel('Recent (This Week)', count: 2)),
+          ),
         ),
       );
-      expect(find.text('RECENT (THIS WEEK) · 2'), findsOneWidget);
+      final textWidget = tester.widget<Text>(find.text('RECENT (THIS WEEK) · 2'));
+      expect(textWidget.style?.fontFamily, 'Poppins');
+    });
+
+    test('AppTheme light mode uses soft light orange background and Poppins font', () {
+      final theme = AppTheme.light();
+      expect(theme.scaffoldBackgroundColor, const Color(0xFFFFF6EE));
+      expect(theme.textTheme.bodyLarge?.fontFamily, 'Poppins');
+      expect(theme.textTheme.titleMedium?.fontFamily, 'Poppins');
+      expect(theme.textTheme.headlineLarge?.fontFamily, 'Poppins');
+    });
+
+    testWidgets('ItemBoardCard uses readable Poppins font for name and location', (
+      tester,
+    ) async {
+      final item = Item(
+        id: '1',
+        name: 'Car Keys',
+        location: 'Hallway Table',
+        dateAdded: DateTime.now(),
+        dateUpdated: DateTime.now(),
+      );
+      await tester.pumpWidget(
+        ScreenUtilInit(
+          designSize: designSize,
+          builder: (context, _) => MaterialApp(
+            theme: AppTheme.light(),
+            home: Scaffold(
+              body: Center(
+                child: SizedBox(
+                  width: 180.w,
+                  child: ItemBoardCard(
+                    item: item,
+                    onTap: () {},
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final nameWidget = tester.widget<Text>(find.text('Car Keys'));
+      expect(nameWidget.style?.fontFamily, 'Poppins');
+      expect(nameWidget.style?.fontWeight, FontWeight.w600);
+
+      final locWidget = tester.widget<Text>(find.text('Hallway Table'));
+      expect(locWidget.style?.fontFamily, 'Poppins');
+      expect(locWidget.style?.fontWeight, FontWeight.w400);
     });
   });
 }
