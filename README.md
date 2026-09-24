@@ -18,9 +18,9 @@ Full requirements: [docs/SRS.md](docs/SRS.md) (written under the working title "
 | --- | --- |
 | Main app | Flutter (Dart), Drift (SQLite) as source of truth |
 | Photos | `image_picker`, stored in the app's Documents dir (relative paths only) |
-| Widget | SwiftUI Widget Extension *(Phase 4)* |
-| Siri | App Intents Extension, Tier 2 "find" *(Phase 4)* |
-| System search | Core Spotlight *(Phase 4)* |
+| Widget | SwiftUI Widget Extension (code in `ios/KnowItWhereKit`) |
+| Siri | App Intents Extension, Tier 2 "find" (code in `ios/KnowItWhereKit`) |
+| System search | Core Spotlight (`ios/Runner/SpotlightPlugin.swift`) |
 | Bridge | App Group shared JSON cache via `home_widget` |
 | Deep links | `app_links` → `go_router` |
 
@@ -31,12 +31,12 @@ Fully offline. No network calls, accounts, or analytics.
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 0 | Requirements | ✅ Done |
-| 1 | Design | ⏳ |
+| 1 | Design | 🟡 Voice UX done; architecture, screen and widget designs await sign-off |
 | 2 | Core Flutter app (FR1–FR3) | ✅ Done |
-| 3 | Shared data layer, App Group, deep links | 🚧 In progress |
-| 4 | Native widget, Siri, Spotlight | ⏳ |
-| 5 | Testing & QA | ⏳ |
-| 6 | Release prep | ⏳ |
+| 3 | Shared data layer, App Group, deep links | ✅ Done |
+| 4 | Native widget, Siri, Spotlight | 🟡 Spotlight done; widget + Siri code ready in `ios/KnowItWhereKit`, targets need a Mac ([guide](docs/phase-4-xcode-setup.md)) |
+| 5 | Testing & QA | 🟡 Unit, integration and automated accessibility tests done; device testing pending |
+| 6 | Release prep | 🟡 Icon, listing copy, privacy answers, reviewer notes done; screenshots, public privacy/support URLs pending |
 | 7 | Post-launch | ⏳ |
 
 Work is tracked as GitHub issues grouped by milestone (one milestone per phase).
