@@ -65,6 +65,14 @@ void main() {
     expect((await repo.getAll()).map((i) => i.name), ['A', 'B']);
   });
 
+  test('recency ordering keeps sub-second precision', () async {
+    await repo.add(name: 'First', location: 'x');
+    now = now.add(const Duration(milliseconds: 5));
+    await repo.add(name: 'Second', location: 'x');
+
+    expect((await repo.getAll()).map((i) => i.name), ['Second', 'First']);
+  });
+
   test('delete removes the item and restore brings it back', () async {
     final item = await repo.add(
       name: 'Keys',
