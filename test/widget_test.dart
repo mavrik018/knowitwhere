@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:knowitwhere/app.dart';
@@ -131,5 +132,28 @@ void main() {
     await tester.tap(find.text('Tent'));
     await tester.pumpAndSettle();
     expect(find.bySemanticsLabel('Photo of Tent'), findsOneWidget);
+  });
+
+  testWidgets('deep links open the add form and item detail', (tester) async {
+    final item = await repo.add(name: 'Passport', location: 'Desk drawer');
+    final links = StreamController<Uri>();
+    addTearDown(links.close);
+    await tester.pumpWidget(
+      KnowItWhereApp(repository: repo, photos: photos, deepLinks: links.stream),
+    );
+    await tester.pumpAndSettle();
+
+    links.add(Uri.parse('knowitwhere://item/${item.id}'));
+    await tester.pumpAndSettle();
+    expect(find.text('Stored in'), findsOneWidget);
+
+    links.add(Uri.parse('knowitwhere://add'));
+    await tester.pumpAndSettle();
+    expect(find.text('Save item'), findsOneWidget);
+
+    // Unknown links are ignored.
+    links.add(Uri.parse('knowitwhere://nope'));
+    await tester.pumpAndSettle();
+    expect(find.text('Save item'), findsOneWidget);
   });
 }

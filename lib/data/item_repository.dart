@@ -61,7 +61,7 @@ class ItemRepository {
       dateUpdated: now,
     );
     await _db.into(_db.items).insert(item);
-    await _notify();
+    await publishSnapshot();
     return item;
   }
 
@@ -73,7 +73,7 @@ class ItemRepository {
       dateUpdated: _clock(),
     );
     await _db.update(_db.items).replace(updated);
-    await _notify();
+    await publishSnapshot();
     return updated;
   }
 
@@ -81,14 +81,16 @@ class ItemRepository {
   /// so that [restore] (swipe-to-delete undo) can bring the item back intact.
   Future<void> delete(String id) async {
     await (_db.delete(_db.items)..where((t) => t.id.equals(id))).go();
-    await _notify();
+    await publishSnapshot();
   }
 
   /// Re-inserts a previously deleted item unchanged.
   Future<void> restore(Item item) async {
     await _db.into(_db.items).insertOnConflictUpdate(item);
-    await _notify();
+    await publishSnapshot();
   }
 
-  Future<void> _notify() async => _sink.onItemsChanged(await getAll());
+  /// Pushes the current full list to the sink, e.g. at launch so the shared
+  /// cache is rebuilt after a backup restore.
+  Future<void> publishSnapshot() async => _sink.onItemsChanged(await getAll());
 }
