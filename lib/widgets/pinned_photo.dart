@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../app_scope.dart';
 import '../data/database.dart';
@@ -6,7 +7,8 @@ import '../theme/app_theme.dart';
 import 'item_photo.dart';
 
 /// An item's photo "pinned" to the card with a thumbpin, or a soft
-/// placeholder when there is no photo.
+/// placeholder when there is no photo. [radius] and [pinSize] are in design
+/// units and are scaled with ScreenUtil.
 class PinnedPhoto extends StatelessWidget {
   const PinnedPhoto({
     super.key,
@@ -38,7 +40,7 @@ class PinnedPhoto extends StatelessWidget {
             child: Center(
               child: Icon(
                 Icons.inventory_2_outlined,
-                size: 40,
+                size: 30.r,
                 color: AppColors.orange,
               ),
             ),
@@ -54,11 +56,11 @@ class PinnedPhoto extends StatelessWidget {
       clipBehavior: Clip.none,
       children: [
         ClipRRect(
-          borderRadius: BorderRadius.circular(radius),
+          borderRadius: BorderRadius.circular(radius.r),
           child: AspectRatio(aspectRatio: aspectRatio, child: photo),
         ),
         Positioned(
-          top: -effectivePinSize * 0.42,
+          top: -effectivePinSize.r * 0.42,
           left: 0,
           right: 0,
           child: Center(child: PinDot(size: effectivePinSize)),
@@ -77,6 +79,7 @@ class PinDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = this.size.r;
     return ExcludeSemantics(
       child: Image.asset(
         asset,

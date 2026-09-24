@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class EmptyState extends StatelessWidget {
   const EmptyState({
@@ -22,19 +23,19 @@ class EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           illustration ??
-              Icon(icon, size: 56, color: theme.colorScheme.primary),
-          const SizedBox(height: 16),
+              Icon(icon, size: 48.r, color: theme.colorScheme.primary),
+          SizedBox(height: 14.h),
           Text(
             title,
             style: theme.textTheme.titleLarge,
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 6.h),
           Text(
             message,
             style: theme.textTheme.bodyMedium?.copyWith(
@@ -42,7 +43,7 @@ class EmptyState extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ),
-          if (action != null) ...[const SizedBox(height: 20), action!],
+          if (action != null) ...[SizedBox(height: 18.h), action!],
         ],
       ),
     );

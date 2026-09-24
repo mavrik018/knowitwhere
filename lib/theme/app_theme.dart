@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// Warm cream / ink / orange palette, tuned to the squirrel mascot.
 abstract final class AppColors {
@@ -123,45 +124,77 @@ abstract final class AppTheme {
   static ThemeData _build(ColorScheme scheme, AppPalette palette) {
     final base = ThemeData(colorScheme: scheme, useMaterial3: true);
     final t = base.textTheme;
+    // iOS Human Interface Guidelines sizes at the default text setting,
+    // scaled from the 411×914 design with .sp. Dynamic Type still applies
+    // on top through MediaQuery's text scaler.
+    TextStyle? style(
+      TextStyle? s,
+      double size,
+      FontWeight weight, {
+      double? height,
+      double letterSpacing = 0,
+    }) => s?.copyWith(
+      fontSize: size.sp,
+      fontWeight: weight,
+      height: height,
+      letterSpacing: letterSpacing,
+    );
     final text = t.copyWith(
-      // "Good morning."
-      headlineLarge: t.headlineLarge?.copyWith(
-        fontSize: 34,
-        height: 1.1,
-        fontWeight: FontWeight.w800,
-        letterSpacing: -1.2,
-      ),
-      // "What are you looking for?"
-      headlineSmall: t.headlineSmall?.copyWith(
-        fontSize: 26,
+      // Title 1 (28): "Good morning.", item name on the detail screen.
+      headlineLarge: style(
+        t.headlineLarge,
+        28,
+        FontWeight.w800,
         height: 1.15,
-        fontWeight: FontWeight.w500,
-        letterSpacing: -0.8,
-        color: scheme.onSurfaceVariant,
+        letterSpacing: -0.6,
       ),
-      headlineMedium: t.headlineMedium?.copyWith(
-        fontWeight: FontWeight.w800,
-        letterSpacing: -0.8,
+      headlineMedium: style(
+        t.headlineMedium,
+        28,
+        FontWeight.w800,
+        height: 1.15,
+        letterSpacing: -0.6,
       ),
-      titleLarge: t.titleLarge?.copyWith(
-        fontWeight: FontWeight.w700,
-        letterSpacing: -0.4,
-      ),
-      titleMedium: t.titleMedium?.copyWith(
-        fontWeight: FontWeight.w700,
+      // Title 3 (20): "What are you looking for?".
+      headlineSmall: style(
+        t.headlineSmall,
+        20,
+        FontWeight.w500,
+        height: 1.2,
+        letterSpacing: -0.3,
+      )?.copyWith(color: scheme.onSurfaceVariant),
+      // Title 3 (20): screen titles, location headers, empty-state titles.
+      titleLarge: style(t.titleLarge, 20, FontWeight.w700, letterSpacing: -0.3),
+      // Headline (17 semibold): item names.
+      titleMedium: style(
+        t.titleMedium,
+        17,
+        FontWeight.w600,
         letterSpacing: -0.2,
       ),
-      // Eyebrows and section chips.
-      labelMedium: t.labelMedium?.copyWith(
-        fontSize: 12.5,
-        fontWeight: FontWeight.w800,
-        letterSpacing: 0.9,
+      // Subhead (15): tabs.
+      titleSmall: style(t.titleSmall, 15, FontWeight.w500),
+      // Body (17), Subhead (15), Footnote (13).
+      bodyLarge: style(t.bodyLarge, 17, FontWeight.w400, height: 1.35),
+      bodyMedium: style(t.bodyMedium, 15, FontWeight.w400, height: 1.3),
+      bodySmall: style(t.bodySmall, 13, FontWeight.w400, height: 1.3),
+      // Buttons: Headline (17 semibold).
+      labelLarge: style(t.labelLarge, 17, FontWeight.w600),
+      // Caption 1 (12): eyebrows and section chips.
+      labelMedium: style(
+        t.labelMedium,
+        12,
+        FontWeight.w700,
+        letterSpacing: 0.8,
       ),
+      // Caption 2 (11): the smallest text allowed.
+      labelSmall: style(t.labelSmall, 11, FontWeight.w500),
     );
-    final radius = BorderRadius.circular(18);
+    final radius = BorderRadius.circular(16.r);
     return base.copyWith(
       scaffoldBackgroundColor: scheme.surface,
       textTheme: text,
+      iconTheme: base.iconTheme.copyWith(size: 22.r),
       extensions: [palette],
       appBarTheme: AppBarTheme(
         backgroundColor: scheme.surface,
@@ -169,104 +202,115 @@ abstract final class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        titleTextStyle: text.titleLarge?.copyWith(color: scheme.onSurface),
+        toolbarHeight: 52.h,
+        iconTheme: IconThemeData(size: 22.r, color: scheme.onSurface),
+        actionsIconTheme: IconThemeData(size: 22.r, color: scheme.onSurface),
+        titleTextStyle: text.titleMedium?.copyWith(color: scheme.onSurface),
       ),
       cardTheme: CardThemeData(
         color: scheme.surfaceContainerLowest,
         elevation: 0,
         margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.r),
+        ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: palette.field,
-        hintStyle: TextStyle(
+        // Sizes follow the HIG scale (.sp); colours and weights are the
+        // refined field styling.
+        hintStyle: text.bodyLarge?.copyWith(
           color: scheme.onSurfaceVariant.withValues(alpha: 0.7),
-          fontSize: 16,
           fontWeight: FontWeight.w400,
         ),
-        labelStyle: TextStyle(
+        labelStyle: text.bodyLarge?.copyWith(
           color: scheme.onSurfaceVariant,
-          fontSize: 15,
           fontWeight: FontWeight.w500,
         ),
-        floatingLabelStyle: const TextStyle(
+        floatingLabelStyle: text.bodySmall?.copyWith(
           color: AppColors.orange,
-          fontSize: 13,
           fontWeight: FontWeight.w600,
         ),
+        prefixIconConstraints: BoxConstraints(minWidth: 44.w),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14.r),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14.r),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14.r),
           borderSide: const BorderSide(color: AppColors.orange, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14.r),
           borderSide: const BorderSide(color: AppColors.danger, width: 1.5),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14.r),
           borderSide: const BorderSide(color: AppColors.danger, width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
-        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
         prefixIconColor: scheme.onSurfaceVariant.withValues(alpha: 0.8),
         suffixIconColor: scheme.onSurfaceVariant.withValues(alpha: 0.65),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: AppColors.orange,
         foregroundColor: Colors.white,
-        elevation: 6,
-        highlightElevation: 8,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-        sizeConstraints: const BoxConstraints.tightFor(width: 64, height: 64),
+        elevation: 4,
+        highlightElevation: 6,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18.r),
+        ),
+        sizeConstraints: BoxConstraints.tightFor(width: 56.r, height: 56.r),
+        iconSize: 28.r,
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.orange,
           foregroundColor: Colors.white,
-          minimumSize: const Size.fromHeight(56),
-          textStyle: text.labelLarge?.copyWith(
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
-          ),
+          minimumSize: Size.fromHeight(50.h),
+          textStyle: text.labelLarge,
+          iconSize: 20.r,
           shape: RoundedRectangleBorder(borderRadius: radius),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: scheme.onSurface,
-          minimumSize: const Size(0, 48),
+          minimumSize: Size(0, 44.h),
+          textStyle: text.labelLarge,
           side: BorderSide(color: scheme.outlineVariant),
           shape: RoundedRectangleBorder(borderRadius: radius),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: palette.accentText),
+        style: TextButton.styleFrom(
+          foregroundColor: palette.accentText,
+          textStyle: text.labelLarge?.copyWith(fontSize: 15.sp),
+          iconSize: 18.r,
+        ),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppColors.ink,
         actionTextColor: AppColors.orange,
-        contentTextStyle: const TextStyle(
-          color: Color(0xFFFBF8F2),
-          fontSize: 14.5,
+        contentTextStyle: text.bodyMedium?.copyWith(
+          color: const Color(0xFFFBF8F2),
           fontWeight: FontWeight.w500,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(16.r),
           side: const BorderSide(color: Color(0x33FFFFFF), width: 0.8),
         ),
         elevation: 6,
+      ),
+      dialogTheme: DialogThemeData(
+        titleTextStyle: text.titleLarge?.copyWith(color: scheme.onSurface),
+        contentTextStyle: text.bodyLarge?.copyWith(color: scheme.onSurface),
       ),
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.orange,

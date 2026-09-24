@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../theme/app_theme.dart';
 
@@ -20,7 +21,7 @@ class SectionLabel extends StatelessWidget {
       child: Align(
         alignment: Alignment.centerLeft,
         child: Padding(
-          padding: const EdgeInsets.only(top: 8),
+          padding: EdgeInsets.only(top: 8.h),
           child: Stack(
             clipBehavior: Clip.none,
             children: [
@@ -30,7 +31,7 @@ class SectionLabel extends StatelessWidget {
                   color: isDark
                       ? const Color(0xFF38322B)
                       : const Color(0xFFEDE3D0),
-                  borderRadius: BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(5.r),
                   border: Border.all(
                     color: isDark
                         ? const Color(0x33FFFFFF)
@@ -46,9 +47,9 @@ class SectionLabel extends StatelessWidget {
                   ],
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 7,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 6.h,
                   ),
                   child: Text(
                     label.toUpperCase(),
@@ -59,7 +60,7 @@ class SectionLabel extends StatelessWidget {
                         'Menlo',
                         'monospace',
                       ],
-                      fontSize: 12.5,
+                      fontSize: 12.sp,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.4,
                       color: isDark
@@ -71,18 +72,18 @@ class SectionLabel extends StatelessWidget {
               ),
               // Frosted semi-transparent tape at the top center
               Positioned(
-                top: -7,
+                top: -7.h,
                 left: 0,
                 right: 0,
                 child: Center(
                   child: Container(
-                    width: 44,
-                    height: 14,
+                    width: 44.w,
+                    height: 14.h,
                     decoration: BoxDecoration(
                       color: isDark
                           ? const Color(0x44FFFFFF)
                           : const Color(0x88E8DECD),
-                      borderRadius: BorderRadius.circular(2),
+                      borderRadius: BorderRadius.circular(2.r),
                       border: Border.all(
                         color: const Color(0x33FFFFFF),
                         width: 0.5,
@@ -119,7 +120,7 @@ class Eyebrow extends StatelessWidget {
       text.toUpperCase(),
       style: theme.textTheme.labelMedium?.copyWith(
         color: AppPalette.of(context).accentText,
-        fontSize: 13.5,
+        fontSize: 13.sp,
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:knowitwhere/app.dart';
 import 'package:knowitwhere/data/database.dart';
@@ -51,9 +52,7 @@ void main() {
 
     testWidgets('OnboardingScreen does not display SiriBar', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: OnboardingScreen(onDone: () {}),
-        ),
+        MaterialApp(home: OnboardingScreen(onDone: () {})),
       );
       expect(find.byType(SiriBar), findsNothing);
       expect(find.textContaining('Hey Siri'), findsNothing);
@@ -61,43 +60,56 @@ void main() {
     });
 
     testWidgets('PinDot renders thumbpin asset image', (tester) async {
+      // Scaled widgets need ScreenUtil, as in the real app.
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: PinDot(size: 28)),
+        ScreenUtilInit(
+          designSize: designSize,
+          builder: (context, _) =>
+              const MaterialApp(home: Scaffold(body: PinDot(size: 28))),
         ),
       );
       final image = tester.widget<Image>(find.byType(Image));
       expect(image.image, isA<AssetImage>());
-      expect((image.image as AssetImage).assetName, 'assets/images/thumbpin.png');
+      expect(
+        (image.image as AssetImage).assetName,
+        'assets/images/thumbpin.png',
+      );
     });
 
-    testWidgets('Text form fields show circular clear button when text is entered', (tester) async {
-      usePhoneScreen(tester);
-      await tester.pumpWidget(KnowItWhereApp(repository: repo, photos: photos));
-      await tester.pumpAndSettle();
+    testWidgets(
+      'Text form fields show circular clear button when text is entered',
+      (tester) async {
+        usePhoneScreen(tester);
+        await tester.pumpWidget(
+          KnowItWhereApp(repository: repo, photos: photos),
+        );
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.byTooltip('Add item'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.byTooltip('Add item'));
+        await tester.pumpAndSettle();
 
-      // Clear button should not be visible when field is empty.
-      expect(find.byIcon(Icons.cancel_rounded), findsNothing);
+        // Clear button should not be visible when field is empty.
+        expect(find.byIcon(Icons.cancel_rounded), findsNothing);
 
-      // Type in name field.
-      await tester.enterText(find.byType(TextFormField).first, 'Headphones');
-      await tester.pumpAndSettle();
+        // Type in name field.
+        await tester.enterText(find.byType(TextFormField).first, 'Headphones');
+        await tester.pumpAndSettle();
 
-      // Clear button should appear.
-      expect(find.byIcon(Icons.cancel_rounded), findsOneWidget);
+        // Clear button should appear.
+        expect(find.byIcon(Icons.cancel_rounded), findsOneWidget);
 
-      // Tap clear button to reset the text.
-      await tester.tap(find.byTooltip('Clear name'));
-      await tester.pumpAndSettle();
+        // Tap clear button to reset the text.
+        await tester.tap(find.byTooltip('Clear name'));
+        await tester.pumpAndSettle();
 
-      expect(find.text('Headphones'), findsNothing);
-      expect(find.byIcon(Icons.cancel_rounded), findsNothing);
-    });
+        expect(find.text('Headphones'), findsNothing);
+        expect(find.byIcon(Icons.cancel_rounded), findsNothing);
+      },
+    );
 
-    testWidgets('Search field uses circular cancel button and clears on tap', (tester) async {
+    testWidgets('Search field uses circular cancel button and clears on tap', (
+      tester,
+    ) async {
       usePhoneScreen(tester);
       await tester.pumpWidget(KnowItWhereApp(repository: repo, photos: photos));
       await tester.pumpAndSettle();
@@ -117,7 +129,9 @@ void main() {
       expect(find.byIcon(Icons.cancel_rounded), findsNothing);
     });
 
-    testWidgets('Deleting an item shows readable snackbar with Undo action', (tester) async {
+    testWidgets('Deleting an item shows readable snackbar with Undo action', (
+      tester,
+    ) async {
       await repo.add(name: 'Wallet', location: 'Nightstand');
       usePhoneScreen(tester);
       await tester.pumpWidget(KnowItWhereApp(repository: repo, photos: photos));
@@ -142,25 +156,30 @@ void main() {
       expect(find.text('Wallet'), findsOneWidget);
     });
 
-    testWidgets('ItemBoardCard renders as an authentic Polaroid with PinDot at top', (tester) async {
-      final item = await repo.add(name: 'Passport', location: 'Top drawer');
-      usePhoneScreen(tester);
-      await tester.pumpWidget(KnowItWhereApp(repository: repo, photos: photos));
-      await tester.pumpAndSettle();
+    testWidgets(
+      'ItemBoardCard renders as an authentic Polaroid with PinDot at top',
+      (tester) async {
+        await repo.add(name: 'Passport', location: 'Top drawer');
+        usePhoneScreen(tester);
+        await tester.pumpWidget(
+          KnowItWhereApp(repository: repo, photos: photos),
+        );
+        await tester.pumpAndSettle();
 
-      // In board view, ItemBoardCard is rendered with Passport and Top drawer
-      expect(find.text('Passport'), findsOneWidget);
-      expect(find.text('Top drawer'), findsOneWidget);
-      // PinDot is rendered on the Polaroid card
-      expect(find.byType(PinDot), findsWidgets);
-    });
+        // In board view, ItemBoardCard is rendered with Passport and Top drawer
+        expect(find.text('Passport'), findsOneWidget);
+        expect(find.text('Top drawer'), findsOneWidget);
+        // PinDot is rendered on the Polaroid card
+        expect(find.byType(PinDot), findsWidgets);
+      },
+    );
 
-    testWidgets('SectionLabel renders taped manila tag with correct text', (tester) async {
+    testWidgets('SectionLabel renders taped manila tag with correct text', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: SectionLabel('Recent (This Week)', count: 2),
-          ),
+          home: Scaffold(body: SectionLabel('Recent (This Week)', count: 2)),
         ),
       );
       expect(find.text('RECENT (THIS WEEK) · 2'), findsOneWidget);

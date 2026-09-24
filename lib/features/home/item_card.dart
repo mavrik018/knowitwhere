@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/semantics.dart';
 
 import '../../app_scope.dart';
@@ -43,10 +44,10 @@ class ItemBoardCard extends StatelessWidget {
     final photoWidget = photoPath == null
         ? ColoredBox(
             color: palette.photoPlaceholder,
-            child: const Center(
+            child: Center(
               child: Icon(
                 Icons.inventory_2_outlined,
-                size: 38,
+                size: 30.r,
                 color: AppColors.orange,
               ),
             ),
@@ -64,17 +65,21 @@ class ItemBoardCard extends StatelessWidget {
       child: Transform.rotate(
         angle: tiltAngle,
         child: Padding(
-          padding: const EdgeInsets.only(top: 10, bottom: 6),
+          padding: EdgeInsets.only(top: 10.h, bottom: 6.h),
           child: Stack(
             clipBehavior: Clip.none,
             children: [
               // Polaroid card container
               DecoratedBox(
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF2C2723) : const Color(0xFFFAF7EE),
-                  borderRadius: BorderRadius.circular(6),
+                  color: isDark
+                      ? const Color(0xFF2C2723)
+                      : const Color(0xFFFAF7EE),
+                  borderRadius: BorderRadius.circular(6.r),
                   border: Border.all(
-                    color: isDark ? const Color(0x33FFFFFF) : const Color(0x1F000000),
+                    color: isDark
+                        ? const Color(0x33FFFFFF)
+                        : const Color(0x1F000000),
                     width: 0.8,
                   ),
                   boxShadow: _polaroidShadow(theme),
@@ -83,15 +88,15 @@ class ItemBoardCard extends StatelessWidget {
                   type: MaterialType.transparency,
                   child: InkWell(
                     onTap: onTap,
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(6.r),
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(9, 9, 9, 12),
+                      padding: EdgeInsets.fromLTRB(9.w, 9.h, 9.w, 12.h),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           // Photo container with thin polaroid inset
                           ClipRRect(
-                            borderRadius: BorderRadius.circular(2),
+                            borderRadius: BorderRadius.circular(2.r),
                             child: AspectRatio(
                               aspectRatio: 1.0,
                               child: Hero(
@@ -100,10 +105,10 @@ class ItemBoardCard extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10.h),
                           // Polaroid bottom chin: handwritten note area
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            padding: EdgeInsets.symmetric(horizontal: 4.w),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -113,7 +118,7 @@ class ItemBoardCard extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontFamilyFallback: _handwrittenFonts,
-                                    fontSize: 16,
+                                    fontSize: 17.sp,
                                     fontWeight: FontWeight.w700,
                                     color: isDark
                                         ? const Color(0xFFF1ECE4)
@@ -122,14 +127,14 @@ class ItemBoardCard extends StatelessWidget {
                                     letterSpacing: -0.2,
                                   ),
                                 ),
-                                const SizedBox(height: 4),
+                                SizedBox(height: 4.h),
                                 Text(
                                   item.location,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontFamilyFallback: _handwrittenFonts,
-                                    fontSize: 13,
+                                    fontSize: 15.sp,
                                     fontStyle: FontStyle.italic,
                                     fontWeight: FontWeight.w500,
                                     color: isDark
@@ -148,13 +153,11 @@ class ItemBoardCard extends StatelessWidget {
                 ),
               ),
               // Thumbpin at top center of the Polaroid
-              const Positioned(
-                top: -12,
+              Positioned(
+                top: -12.r,
                 left: 0,
                 right: 0,
-                child: Center(
-                  child: PinDot(size: 28),
-                ),
+                child: const Center(child: PinDot(size: 28)),
               ),
             ],
           ),
@@ -195,36 +198,36 @@ class ItemCard extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(18.r),
           boxShadow: _cardShadow(theme),
         ),
         child: Material(
           type: MaterialType.transparency,
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(18.r),
             child: Padding(
-              padding: const EdgeInsets.all(10),
+              padding: EdgeInsets.all(8.r),
               child: Row(
                 children: [
                   SizedBox(
-                    width: 56,
+                    width: 48.r,
                     child: PinnedPhoto(
                       item: item,
-                      radius: 14,
+                      radius: 12,
                       heroTag: 'photo-${item.id}',
-                      cacheWidth: (56 * MediaQuery.devicePixelRatioOf(context))
+                      cacheWidth: (48 * MediaQuery.devicePixelRatioOf(context))
                           .round(),
                     ),
                   ),
-                  const SizedBox(width: 14),
+                  SizedBox(width: 12.w),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(item.name, style: theme.textTheme.titleMedium),
                         if (showLocation) ...[
-                          const SizedBox(height: 3),
+                          SizedBox(height: 2.h),
                           _LocationLine(item.location, maxLines: 2),
                         ],
                       ],
@@ -232,6 +235,7 @@ class ItemCard extends StatelessWidget {
                   ),
                   Icon(
                     Icons.chevron_right,
+                    size: 22.r,
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ],
@@ -250,8 +254,8 @@ List<BoxShadow> _cardShadow(ThemeData theme) =>
     : const [
         BoxShadow(
           color: Color(0x14000000),
-          blurRadius: 18,
-          offset: Offset(0, 6),
+          blurRadius: 14,
+          offset: Offset(0, 4),
         ),
       ];
 
@@ -291,11 +295,15 @@ class _LocationLine extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(top: 2),
-          child: Icon(Icons.place_outlined, size: 17, color: AppColors.orange),
+        Padding(
+          padding: EdgeInsets.only(top: 1.h),
+          child: Icon(
+            Icons.place_outlined,
+            size: 15.r,
+            color: AppColors.orange,
+          ),
         ),
-        const SizedBox(width: 4),
+        SizedBox(width: 3.w),
         Expanded(
           child: Text(
             location,

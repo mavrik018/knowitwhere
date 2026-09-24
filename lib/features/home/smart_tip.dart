@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../theme/app_theme.dart';
 
@@ -26,18 +27,18 @@ class SmartTip extends StatelessWidget {
     final palette = AppPalette.of(context);
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+      padding: EdgeInsets.fromLTRB(16.w, 14.h, 16.w, 16.h),
       decoration: BoxDecoration(
         color: palette.tip,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20.r),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.lightbulb_outline, size: 18, color: palette.tipText),
-              const SizedBox(width: 6),
+              Icon(Icons.lightbulb_outline, size: 16.r, color: palette.tipText),
+              SizedBox(width: 6.w),
               Flexible(
                 child: Text(
                   'SMART TIP',
@@ -48,10 +49,10 @@ class SmartTip extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 6.h),
           Text(
             tips[day % tips.length],
-            style: theme.textTheme.bodyLarge?.copyWith(
+            style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurface,
               height: 1.35,
               letterSpacing: 0.1,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app_scope.dart';
@@ -122,40 +123,40 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
+        padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 32.h),
         children: [
           PinnedPhoto(
             item: item,
             aspectRatio: item.photoPath == null ? 2.2 : 4 / 3,
-            radius: 28,
+            radius: 22,
             heroTag: 'photo-${item.id}',
             semanticLabel: 'Photo of ${item.name}',
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 18.h),
           Semantics(
             header: true,
             child: Text(item.name, style: theme.textTheme.headlineMedium),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 12.h),
           Container(
-            padding: const EdgeInsets.all(18),
+            padding: EdgeInsets.all(14.r),
             decoration: BoxDecoration(
               color: palette.accentSoft,
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: BorderRadius.circular(18.r),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  width: 40,
-                  height: 40,
+                  width: 36.r,
+                  height: 36.r,
                   decoration: const BoxDecoration(
                     color: AppColors.orange,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.place, color: Colors.white),
+                  child: Icon(Icons.place, size: 20.r, color: Colors.white),
                 ),
-                const SizedBox(width: 14),
+                SizedBox(width: 12.w),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,7 +168,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      SizedBox(height: 2.h),
                       Text(item.location, style: theme.textTheme.titleLarge),
                     ],
                   ),
@@ -175,15 +176,15 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14.h),
           Row(
             children: [
               Icon(
                 Icons.history_rounded,
-                size: 18,
+                size: 16.r,
                 color: theme.colorScheme.onSurfaceVariant,
               ),
-              const SizedBox(width: 6),
+              SizedBox(width: 6.w),
               Expanded(
                 child: Text(
                   'Updated ${relativeDate(item.dateUpdated, DateTime.now())}',
@@ -194,9 +195,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 28),
+          SizedBox(height: 24.h),
           const Eyebrow('Ask Siri'),
-          const SizedBox(height: 10),
+          SizedBox(height: 10.h),
           SiriBar(phrase: 'Hey Siri, where’s my ${item.name} in KnowItWhere?'),
         ],
       ),
