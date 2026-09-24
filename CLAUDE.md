@@ -11,6 +11,7 @@ Local-only iOS app (Flutter + native Swift extensions) for remembering where you
 - The CI iOS build is skipped on pull requests. For `ios/` changes, run `gh workflow run CI --ref <branch>` and check that run too.
 - Before committing: `dart format lib test`, `flutter analyze` (no issues), `flutter test` (all pass). For Swift changes: `swift test` in `ios/KnowItWhereKit`.
 - Don't add scope beyond the SRS. New ideas go to issue #26 (v1 backlog).
+- Sizing: every in-app dimension uses flutter_screenutil (`.w/.h/.r/.sp`) against the 411×914 design; text follows the iOS HIG scale in `lib/theme/app_theme.dart`. The onboarding screen keeps fixed sizes on purpose.
 - The user does manual device testing at the end. Don't block on it; collect items for the final pass.
 
 ## Commands
