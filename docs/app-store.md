@@ -1,0 +1,106 @@
+# App Store submission (SRS §8, Phase 6)
+
+Draft copy and answers for App Store Connect. Field limits are noted where Apple enforces them.
+
+## Listing (6.1)
+
+| Field | Value |
+| --- | --- |
+| Name (30) | knowitwhere |
+| Subtitle (30) | Remember where you put things |
+| Bundle ID | com.AandMapps.knowitwhere |
+| Primary category | Productivity |
+| Secondary category | Utilities |
+| Price | Free, no in-app purchases (SRS §2.1) |
+| Age rating | 4+ (no objectionable content) |
+
+**Keywords (100, comma-separated, no spaces; the app name is indexed automatically)**
+
+```
+where did i put,storage tracker,item finder,inventory,declutter,find my stuff,organizer,lost,stash
+```
+
+(98 characters.)
+
+**Promotional text (170)**
+
+> Put it somewhere safe, then forgot where? Save it in seconds, then find it by typing, glancing at your home screen, or asking Siri.
+
+**Description (4000)**
+
+> knowitwhere remembers where you put things, so you don't have to.
+>
+> Passports, spare keys, cables, warranty papers, the tent in the loft: save what it is and where it went, with a photo if you like. When you need it again, find it in seconds.
+>
+> FIND IT THREE WAYS
+> • Type: live search as you type, best matches first
+> • Glance: a home-screen widget shows what you put away most recently
+> • Ask: "Hey Siri, find something in knowitwhere" — Siri tells you where it is, without opening the app
+>
+> FAST TO ADD
+> • Just a name and a place — free text, no folders to set up
+> • Optional photo of the spot
+> • Edit when you move it, swipe to delete
+>
+> PRIVATE BY DESIGN
+> • Everything stays on your iPhone. No account, no cloud, no tracking, no ads
+> • Works fully offline
+> • Included in your normal iPhone backup
+>
+> Also shows up in Spotlight search.
+
+**Screenshots:** use the hero-shot pattern from Phase 1: a large caption over a device frame, cream background. Required size is 6.9" (1320 × 2868); Apple scales it down for smaller displays. Suggested set:
+
+1. "Where did I put that?" (home list with a search in progress)
+2. "Save it in seconds" (add form with photo)
+3. "Ask Siri" (Siri answer banner)
+4. "Right on your home screen" (medium widget)
+5. "Private. On your phone only." (detail screen)
+
+## App Privacy (6.2)
+
+App Store Connect → App Privacy → **Data Not Collected**. There are no network calls, analytics SDKs or accounts (SRS §7). Nothing leaves the device apart from the user's own iCloud/iTunes device backup, which Apple doesn't count as collection.
+
+**Privacy policy URL:** still needed. Apple requires one even for apps that collect nothing. A one-paragraph page ("knowitwhere stores all data on your device and collects nothing") is enough, but it has to be publicly reachable. The GitHub repo is private, so it can't host it as-is.
+
+**Support URL:** also required and must be public. It can be the same page with a contact email.
+
+### Usage strings in Info.plist
+
+| Key | Text |
+| --- | --- |
+| NSCameraUsageDescription | Used to photograph where you stored an item. |
+| NSPhotoLibraryUsageDescription | Used to attach a photo of where you stored an item. |
+| NSSiriUsageDescription | Lets you ask Siri where you put something. |
+
+### Entitlements checklist
+
+- [ ] `group.com.AandMapps.knowitwhere` ticked on Runner, the widget extension and the Siri extension
+- [ ] All three share the same team; bundle IDs are `com.AandMapps.knowitwhere`, `…​.KnowItWhereWidgetExtension`, `…​.KnowItWhereSiri`
+
+## Review notes (6.3)
+
+Paste into App Store Connect → App Review Information → Notes:
+
+> knowitwhere stores everything locally; there is no account or login.
+>
+> To test the core flow:
+> 1. Open the app and tap "Add item". Enter "Passport" as the name and "Desk drawer" as the location, then tap "Save item".
+> 2. Type "pass" in the search field. The item appears.
+>
+> To test Siri (the main feature; please test on a device with Siri enabled):
+> 1. After step 1 above, say: "Hey Siri, find something in knowitwhere".
+> 2. Siri asks "What are you looking for?". Say: "Passport".
+> 3. Expected: Siri says "Passport is here: Desk drawer." The app does not open.
+>
+> The same action is available in the Shortcuts app as "Find an Item".
+>
+> To test the widget: add the "Recent items" widget from the home-screen widget gallery. It shows saved items; tapping one opens it in the app.
+>
+> To test Spotlight: swipe down on the home screen and search "Passport". Tapping the result opens the item.
+
+## Submission (6.4)
+
+- [ ] Archive from Xcode (Product → Archive) with the Runner scheme, *Any iOS Device*
+- [ ] Upload, then attach the build in App Store Connect
+- [ ] Fill in listing, privacy, review notes above; submit
