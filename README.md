@@ -91,6 +91,12 @@ Extensions only read this — the Drift database stays private to the app.
 | `knowitwhere://add` | Add item form |
 | `knowitwhere://item/{id}` | Item detail |
 
+### Docs
+
+- [Siri voice UX](docs/siri-voice-ux.md): phrases, spoken copy, matching
+- [Phase 4 Xcode setup](docs/phase-4-xcode-setup.md): adding the widget and Siri targets on a Mac
+- [App Store submission](docs/app-store.md): listing, keywords, privacy, reviewer notes
+
 ### Signing (Mac)
 
 Set your team under *Signing & Capabilities* for each target. Automatic signing
