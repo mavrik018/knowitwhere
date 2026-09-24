@@ -40,7 +40,7 @@ Siri extension  ──┴─ read-only from the App Group JSON via ios/KnowItWhe
 | `lib/data/` | Drift DB (`database.dart`, generated `database.g.dart` committed), `item_repository.dart` (mutations call `ItemChangeSink`), `photo_store.dart` |
 | `lib/platform/` | `shared_cache.dart` (App Group writer), `spotlight.dart`, `deep_links.dart` |
 | `lib/features/` | `home/` (Board / Index / Locations, search), `item_form/`, `item_detail/`, `onboarding/` |
-| `lib/theme/app_theme.dart` | Cream / ink / orange tokens; `AppPalette` extension |
+| `lib/theme/app_theme.dart` | Cream / ink / orange tokens; `AppPalette` extension; iOS HIG type scale in `.sp` (ScreenUtil design size 411×914, set in `lib/app.dart`) |
 | `ios/Runner/` | `SpotlightPlugin.swift`, `Runner.entitlements` (App Group), `Info.plist` (usage strings, URL scheme) |
 | `ios/KnowItWhereKit/` | Swift package: `KnowItWhereCore` (cache reader, `ItemMatcher`, `VoiceCopy`, `DeepLink`), `KnowItWhereWidgetUI` (the widget), `KnowItWhereIntents` (`FindItemLocationIntent`). XCTests in `Tests/` |
 | `docs/phase-4-xcode-setup.md` | Step-by-step Xcode target creation with the exact entry files |
@@ -76,7 +76,7 @@ If all of these pass, start Task 0.
 
 ## Task 0: App icon (done)
 
-The app icon is the squirrel. The master is `design/app-icon/app-icon-master.png` (1024×1024, no transparency); `python tool/make_app_icon.py` regenerates every iOS size and `site/icon.png`. Don't use `flutter_launcher_icons`: it breaks `ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS` in `project.pbxproj` and adds Android files. The app is iOS-only; there's no `android/` folder.
+The app icon is the squirrel. The master is `design/app-icon/app-icon-master.png` (1024×1024, no transparency); `python tool/make_app_icon.py` regenerates every iOS size and `site/icon.png`. Don't use `flutter_launcher_icons`: it breaks `ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS` in `project.pbxproj` and adds Android files. The shipping target is iOS only. `android/` exists for the user's local testing on an Android phone; keep it, but don't build Android features or submit to Google Play (out of scope, SRS §9).
 
 ## Task 1: Add the widget and Siri extension targets (user + Claude)
 

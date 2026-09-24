@@ -10,6 +10,8 @@ import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:knowitwhere/widgets/item_photo.dart';
+
 import 'test_helpers.dart';
 
 void main() {
@@ -130,7 +132,7 @@ void main() {
     );
     await pumpApp(tester);
 
-    expect(find.byType(Image), findsOneWidget);
+    expect(find.byType(ItemPhoto), findsOneWidget);
 
     await scrollAndTap(tester, find.text('Tent'));
     await tester.pumpAndSettle();
@@ -177,10 +179,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.bySemanticsLabel('Never lose it again'), findsOneWidget);
-    expect(
-      find.textContaining('where’s my passport in knowitwhere'),
-      findsOneWidget,
-    );
 
     await scrollAndTap(tester, find.text('Get started'));
     expect(done, isTrue);

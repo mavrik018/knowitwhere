@@ -52,9 +52,29 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       ),
     );
     if (confirmed != true || !mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
     // Leave first so this screen never renders the "not found" state.
     context.pop();
     await repo.delete(item.id);
+    messenger
+      ..clearSnackBars()
+      ..showSnackBar(
+        SnackBar(
+          duration: const Duration(seconds: 3),
+          content: Text(
+            'Deleted "${item.name}"',
+            style: const TextStyle(
+              color: Color(0xFFFBF8F2),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          action: SnackBarAction(
+            label: 'Undo',
+            textColor: AppColors.orange,
+            onPressed: () => repo.restore(item),
+          ),
+        ),
+      );
   }
 
   @override
@@ -178,7 +198,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
           SizedBox(height: 24.h),
           const Eyebrow('Ask Siri'),
           SizedBox(height: 10.h),
-          SiriBar(phrase: 'Hey Siri, where’s my ${item.name} in knowitwhere?'),
+          SiriBar(phrase: 'Hey Siri, where’s my ${item.name} in KnowItWhere?'),
         ],
       ),
     );

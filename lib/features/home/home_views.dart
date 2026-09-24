@@ -32,7 +32,7 @@ List<Widget> boardSlivers(
         padding: _pagePadding,
         sliver: SliverList.separated(
           itemCount: (section.items.length / columns).ceil(),
-          separatorBuilder: (_, _) => SizedBox(height: 12.h),
+          separatorBuilder: (_, _) => SizedBox(height: 18.h),
           itemBuilder: (context, row) {
             final cells = section.items.skip(row * columns).take(columns);
             return IntrinsicHeight(
@@ -44,6 +44,9 @@ List<Widget> boardSlivers(
                     Expanded(
                       child: ItemBoardCard(
                         item: item,
+                        tiltAngle: columns > 1
+                            ? (i == 0 ? -0.024 : 0.022)
+                            : (row % 2 == 0 ? -0.018 : 0.018),
                         onTap: () => actions.open(item),
                         onDelete: () => actions.delete(item),
                       ),

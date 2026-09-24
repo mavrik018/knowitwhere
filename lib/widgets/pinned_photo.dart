@@ -6,15 +6,16 @@ import '../data/database.dart';
 import '../theme/app_theme.dart';
 import 'item_photo.dart';
 
-/// An item's photo "pinned" to the card with an orange dot, or a soft
-/// placeholder when there is no photo. [radius] is in design units and is
-/// scaled with ScreenUtil.
+/// An item's photo "pinned" to the card with a thumbpin, or a soft
+/// placeholder when there is no photo. [radius] and [pinSize] are in design
+/// units and are scaled with ScreenUtil.
 class PinnedPhoto extends StatelessWidget {
   const PinnedPhoto({
     super.key,
     required this.item,
     this.aspectRatio = 1,
     this.radius = 18,
+    this.pinSize,
     this.cacheWidth,
     this.semanticLabel,
     this.heroTag,
@@ -23,6 +24,7 @@ class PinnedPhoto extends StatelessWidget {
   final Item item;
   final double aspectRatio;
   final double radius;
+  final double? pinSize;
   final int? cacheWidth;
   final String? semanticLabel;
   final Object? heroTag;
@@ -31,6 +33,7 @@ class PinnedPhoto extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = AppPalette.of(context);
     final photoPath = item.photoPath;
+    final effectivePinSize = pinSize ?? (radius <= 14 ? 18.0 : 28.0);
     Widget photo = photoPath == null
         ? ColoredBox(
             color: palette.photoPlaceholder,
@@ -57,10 +60,10 @@ class PinnedPhoto extends StatelessWidget {
           child: AspectRatio(aspectRatio: aspectRatio, child: photo),
         ),
         Positioned(
-          top: -5.r,
+          top: -effectivePinSize.r * 0.42,
           left: 0,
           right: 0,
-          child: const Center(child: PinDot()),
+          child: Center(child: PinDot(size: effectivePinSize)),
         ),
       ],
     );
@@ -68,7 +71,9 @@ class PinnedPhoto extends StatelessWidget {
 }
 
 class PinDot extends StatelessWidget {
-  const PinDot({super.key, this.size = 14});
+  const PinDot({super.key, this.size = 28});
+
+  static const asset = 'assets/images/thumbpin.png';
 
   final double size;
 
@@ -76,21 +81,12 @@ class PinDot extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = this.size.r;
     return ExcludeSemantics(
-      child: Container(
+      child: Image.asset(
+        asset,
         width: size,
         height: size,
-        decoration: BoxDecoration(
-          color: AppColors.orange,
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: size * 0.2),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x33000000),
-              blurRadius: 4,
-              offset: Offset(0, 1),
-            ),
-          ],
-        ),
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.medium,
       ),
     );
   }

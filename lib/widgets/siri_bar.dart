@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
 /// Example Siri phrase: the one-sentence App Shortcut (docs/siri-voice-ux.md).
-const siriExamplePhrase = 'Hey Siri, where’s my passport in knowitwhere?';
+const siriExamplePhrase = 'Hey Siri, where’s my passport in KnowItWhere?';
 
 /// A dark "listening" pill with a mic icon and a quoted Siri phrase.
 class SiriBar extends StatelessWidget {

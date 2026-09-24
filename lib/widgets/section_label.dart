@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../theme/app_theme.dart';
 
-/// Upper-case section chip, e.g. "RECENT (THIS WEEK) · 2".
+/// Upper-case section chip rendered as a taped manila paper label, e.g. "RECENT (THIS WEEK) · 2".
 class SectionLabel extends StatelessWidget {
   const SectionLabel(this.text, {super.key, this.count});
 
@@ -13,22 +13,93 @@ class SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final label = count == null ? text : '$text · $count';
+
     return Semantics(
       header: true,
       child: Align(
         alignment: Alignment.centerLeft,
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-          decoration: BoxDecoration(
-            color: AppPalette.of(context).chip,
-            borderRadius: BorderRadius.circular(8.r),
-          ),
-          child: Text(
-            label.toUpperCase(),
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: theme.colorScheme.onSurface,
-            ),
+        child: Padding(
+          padding: EdgeInsets.only(top: 8.h),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // Manila craft paper tag
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF38322B)
+                      : const Color(0xFFEDE3D0),
+                  borderRadius: BorderRadius.circular(5.r),
+                  border: Border.all(
+                    color: isDark
+                        ? const Color(0x33FFFFFF)
+                        : const Color(0x1F000000),
+                    width: 0.8,
+                  ),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x12000000),
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 6.h,
+                  ),
+                  child: Text(
+                    label.toUpperCase(),
+                    style: TextStyle(
+                      fontFamilyFallback: const [
+                        'Courier New',
+                        'Courier',
+                        'Menlo',
+                        'monospace',
+                      ],
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.4,
+                      color: isDark
+                          ? const Color(0xFFE2D8CA)
+                          : const Color(0xFF52483C),
+                    ),
+                  ),
+                ),
+              ),
+              // Frosted semi-transparent tape at the top center
+              Positioned(
+                top: -7.h,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Container(
+                    width: 44.w,
+                    height: 14.h,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? const Color(0x44FFFFFF)
+                          : const Color(0x88E8DECD),
+                      borderRadius: BorderRadius.circular(2.r),
+                      border: Border.all(
+                        color: const Color(0x33FFFFFF),
+                        width: 0.5,
+                      ),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x0A000000),
+                          blurRadius: 2,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

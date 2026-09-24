@@ -2,74 +2,164 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/semantics.dart';
 
+import '../../app_scope.dart';
 import '../../data/database.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/item_photo.dart';
 import '../../widgets/pinned_photo.dart';
 
-/// Board view card: pinned photo, name, location.
+/// Board view card: authentic Polaroid with photo, handwritten title, location, and thumbpin.
 class ItemBoardCard extends StatelessWidget {
   const ItemBoardCard({
     super.key,
     required this.item,
     required this.onTap,
     this.onDelete,
+    this.tiltAngle = 0.0,
   });
 
   final Item item;
   final VoidCallback onTap;
   final VoidCallback? onDelete;
+  final double tiltAngle;
+
+  static const _handwrittenFonts = [
+    'Noteworthy',
+    'Marker Felt',
+    'Chalkboard SE',
+    'Bradley Hand',
+    'Segoe Print',
+    'Ink Free',
+    'Caveat',
+    'cursive',
+  ];
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final photoPath = item.photoPath;
+    final palette = AppPalette.of(context);
+
+    final photoWidget = photoPath == null
+        ? ColoredBox(
+            color: palette.photoPlaceholder,
+            child: Center(
+              child: Icon(
+                Icons.inventory_2_outlined,
+                size: 30.r,
+                color: AppColors.orange,
+              ),
+            ),
+          )
+        : ItemPhoto(
+            file: AppScope.of(context).photos.resolve(photoPath),
+            cacheWidth: (220 * MediaQuery.devicePixelRatioOf(context)).round(),
+            semanticLabel: 'Photo of ${item.name}',
+          );
+
     return _ItemSemantics(
       item: item,
       onTap: onTap,
       onDelete: onDelete,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(22.r),
-          boxShadow: _cardShadow(theme),
-        ),
-        child: Material(
-          type: MaterialType.transparency,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(22.r),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(8.w, 10.h, 8.w, 12.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  PinnedPhoto(
-                    item: item,
-                    aspectRatio: 1.25,
-                    radius: 16,
-                    heroTag: 'photo-${item.id}',
-                    cacheWidth: (220 * MediaQuery.devicePixelRatioOf(context))
-                        .round(),
+      child: Transform.rotate(
+        angle: tiltAngle,
+        child: Padding(
+          padding: EdgeInsets.only(top: 10.h, bottom: 6.h),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // Polaroid card container
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF2C2723)
+                      : const Color(0xFFFAF7EE),
+                  borderRadius: BorderRadius.circular(6.r),
+                  border: Border.all(
+                    color: isDark
+                        ? const Color(0x33FFFFFF)
+                        : const Color(0x1F000000),
+                    width: 0.8,
                   ),
-                  SizedBox(height: 10.h),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          item.name,
-                          style: theme.textTheme.titleMedium,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        SizedBox(height: 3.h),
-                        _LocationLine(item.location),
-                      ],
+                  boxShadow: _polaroidShadow(theme),
+                ),
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: InkWell(
+                    onTap: onTap,
+                    borderRadius: BorderRadius.circular(6.r),
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(9.w, 9.h, 9.w, 12.h),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // Photo container with thin polaroid inset
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(2.r),
+                            child: AspectRatio(
+                              aspectRatio: 1.0,
+                              child: Hero(
+                                tag: 'photo-${item.id}',
+                                child: photoWidget,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 10.h),
+                          // Polaroid bottom chin: handwritten note area
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 4.w),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.name,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontFamilyFallback: _handwrittenFonts,
+                                    fontSize: 17.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: isDark
+                                        ? const Color(0xFFF1ECE4)
+                                        : const Color(0xFF2E2925),
+                                    height: 1.2,
+                                    letterSpacing: -0.2,
+                                  ),
+                                ),
+                                SizedBox(height: 4.h),
+                                Text(
+                                  item.location,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontFamilyFallback: _handwrittenFonts,
+                                    fontSize: 15.sp,
+                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.w500,
+                                    color: isDark
+                                        ? const Color(0xFFB7AFA5)
+                                        : const Color(0xFF6B655D),
+                                    height: 1.25,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
+              // Thumbpin at top center of the Polaroid
+              Positioned(
+                top: -12.r,
+                left: 0,
+                right: 0,
+                child: const Center(child: PinDot(size: 28)),
+              ),
+            ],
           ),
         ),
       ),
@@ -166,6 +256,30 @@ List<BoxShadow> _cardShadow(ThemeData theme) =>
           color: Color(0x14000000),
           blurRadius: 14,
           offset: Offset(0, 4),
+        ),
+      ];
+
+List<BoxShadow> _polaroidShadow(ThemeData theme) =>
+    theme.brightness == Brightness.dark
+    ? const [
+        BoxShadow(
+          color: Color(0x55000000),
+          blurRadius: 12,
+          offset: Offset(0, 4),
+        ),
+      ]
+    : const [
+        BoxShadow(
+          color: Color(0x18000000),
+          blurRadius: 10,
+          spreadRadius: 0,
+          offset: Offset(0, 4),
+        ),
+        BoxShadow(
+          color: Color(0x0C000000),
+          blurRadius: 3,
+          spreadRadius: 0,
+          offset: Offset(0, 1),
         ),
       ];
 

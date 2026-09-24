@@ -218,18 +218,44 @@ abstract final class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: palette.field,
-        hintStyle: text.bodyLarge?.copyWith(color: scheme.onSurfaceVariant),
-        labelStyle: text.bodyLarge?.copyWith(color: scheme.onSurfaceVariant),
+        // Sizes follow the HIG scale (.sp); colours and weights are the
+        // refined field styling.
+        hintStyle: text.bodyLarge?.copyWith(
+          color: scheme.onSurfaceVariant.withValues(alpha: 0.7),
+          fontWeight: FontWeight.w400,
+        ),
+        labelStyle: text.bodyLarge?.copyWith(
+          color: scheme.onSurfaceVariant,
+          fontWeight: FontWeight.w500,
+        ),
+        floatingLabelStyle: text.bodySmall?.copyWith(
+          color: AppColors.orange,
+          fontWeight: FontWeight.w600,
+        ),
         prefixIconConstraints: BoxConstraints(minWidth: 44.w),
         border: OutlineInputBorder(
-          borderRadius: radius,
+          borderRadius: BorderRadius.circular(14.r),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14.r),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: radius,
+          borderRadius: BorderRadius.circular(14.r),
           borderSide: const BorderSide(color: AppColors.orange, width: 2),
         ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14.r),
+          borderSide: const BorderSide(color: AppColors.danger, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14.r),
+          borderSide: const BorderSide(color: AppColors.danger, width: 2),
+        ),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+        prefixIconColor: scheme.onSurfaceVariant.withValues(alpha: 0.8),
+        suffixIconColor: scheme.onSurfaceVariant.withValues(alpha: 0.65),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: AppColors.orange,
@@ -272,10 +298,15 @@ abstract final class AppTheme {
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppColors.ink,
         actionTextColor: AppColors.orange,
-        contentTextStyle: text.bodyMedium?.copyWith(color: Colors.white),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.r),
+        contentTextStyle: text.bodyMedium?.copyWith(
+          color: const Color(0xFFFBF8F2),
+          fontWeight: FontWeight.w500,
         ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+          side: const BorderSide(color: Color(0x33FFFFFF), width: 0.8),
+        ),
+        elevation: 6,
       ),
       dialogTheme: DialogThemeData(
         titleTextStyle: text.titleLarge?.copyWith(color: scheme.onSurface),
