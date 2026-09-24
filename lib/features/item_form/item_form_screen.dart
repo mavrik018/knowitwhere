@@ -1,9 +1,15 @@
+import 'dart:io';
+
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../app_scope.dart';
 import '../../data/database.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/item_photo.dart';
 
 /// Add (FR1.1) and edit (FR1.2) share one form.
 class ItemFormScreen extends StatefulWidget {
@@ -27,6 +33,12 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
   bool _started = false;
   bool _saving = false;
 
+  /// Stored photo (relative path) that will be kept on save.
+  String? _photoPath;
+
+  /// Newly picked photo (absolute temp path), copied into the store on save.
+  String? _pickedPath;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -45,6 +57,7 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
       if (item != null) {
         _name.text = item.name;
         _location.text = item.location;
+        _photoPath = item.photoPath;
       }
     });
   }
@@ -59,14 +72,25 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
   Future<void> _save() async {
     if (_saving || !_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
-    final repo = AppScope.of(context).repository;
+    final scope = AppScope.of(context);
     try {
+      final photoPath = _pickedPath != null
+          ? await scope.photos.save(_pickedPath!)
+          : _photoPath;
       if (_isEdit) {
-        await repo.update(
-          _original!.copyWith(name: _name.text, location: _location.text),
+        await scope.repository.update(
+          _original!.copyWith(
+            name: _name.text,
+            location: _location.text,
+            photoPath: Value(photoPath),
+          ),
         );
       } else {
-        await repo.add(name: _name.text, location: _location.text);
+        await scope.repository.add(
+          name: _name.text,
+          location: _location.text,
+          photoPath: photoPath,
+        );
       }
       if (mounted) context.pop();
     } catch (e) {
@@ -77,6 +101,55 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
       ).showSnackBar(SnackBar(content: Text('Could not save: $e')));
     }
   }
+
+  Future<void> _pickPhoto() async {
+    final picker = ImagePicker();
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (picker.supportsImageSource(ImageSource.camera))
+              ListTile(
+                leading: const Icon(Icons.photo_camera_outlined),
+                title: const Text('Take photo'),
+                onTap: () => Navigator.pop(context, ImageSource.camera),
+              ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('Choose from library'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (source == null) return;
+    try {
+      // Downscale natively first; PhotoStore enforces the 1 MB cap (FR3.3).
+      final picked = await picker.pickImage(
+        source: source,
+        maxWidth: 1600,
+        maxHeight: 1600,
+        imageQuality: 80,
+      );
+      if (picked != null && mounted) {
+        setState(() => _pickedPath = picked.path);
+      }
+    } on PlatformException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Couldn't open photos: ${e.message ?? e.code}")),
+      );
+    }
+  }
+
+  void _removePhoto() => setState(() {
+    _pickedPath = null;
+    _photoPath = null;
+  });
 
   static String? _required(String? value, String message) =>
       (value == null || value.trim().isEmpty) ? message : null;
@@ -130,6 +203,16 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
             ),
             validator: (v) => _required(v, 'Where did you put it?'),
           ),
+          const SizedBox(height: 20),
+          _PhotoField(
+            file: _pickedPath != null
+                ? File(_pickedPath!)
+                : _photoPath != null
+                ? AppScope.of(context).photos.resolve(_photoPath!)
+                : null,
+            onPick: _pickPhoto,
+            onRemove: _removePhoto,
+          ),
           const SizedBox(height: 28),
           FilledButton(
             onPressed: _saving ? null : _save,
@@ -137,6 +220,67 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Optional photo (FR3.1): a pick button, or a preview with change/remove.
+class _PhotoField extends StatelessWidget {
+  const _PhotoField({
+    required this.file,
+    required this.onPick,
+    required this.onRemove,
+  });
+
+  final File? file;
+  final VoidCallback onPick;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final file = this.file;
+    if (file == null) {
+      return OutlinedButton.icon(
+        onPressed: onPick,
+        icon: const Icon(Icons.add_a_photo_outlined),
+        label: const Text('Add a photo (optional)'),
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size.fromHeight(96),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          side: BorderSide(color: theme.colorScheme.outlineVariant),
+        ),
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: AspectRatio(
+            aspectRatio: 4 / 3,
+            child: ItemPhoto(file: file, semanticLabel: 'Selected photo'),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            TextButton.icon(
+              onPressed: onPick,
+              icon: const Icon(Icons.photo_camera_outlined),
+              label: const Text('Change'),
+            ),
+            TextButton.icon(
+              onPressed: onRemove,
+              icon: const Icon(Icons.delete_outline),
+              label: const Text('Remove'),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

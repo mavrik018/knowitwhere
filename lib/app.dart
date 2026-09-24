@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import 'app_scope.dart';
 import 'data/item_repository.dart';
+import 'data/photo_store.dart';
 import 'features/home/home_screen.dart';
 import 'features/item_detail/item_detail_screen.dart';
 import 'features/item_form/item_form_screen.dart';
@@ -37,9 +38,10 @@ GoRouter buildRouter() => GoRouter(
 );
 
 class WdipitApp extends StatefulWidget {
-  const WdipitApp({super.key, required this.repository});
+  const WdipitApp({super.key, required this.repository, required this.photos});
 
   final ItemRepository repository;
+  final PhotoStore photos;
 
   @override
   State<WdipitApp> createState() => _WdipitAppState();
@@ -58,6 +60,7 @@ class _WdipitAppState extends State<WdipitApp> {
   Widget build(BuildContext context) {
     return AppScope(
       repository: widget.repository,
+      photos: widget.photos,
       child: MaterialApp.router(
         title: 'Where Did I Put That?',
         debugShowCheckedModeBanner: false,

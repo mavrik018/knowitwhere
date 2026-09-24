@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:discoverly/app.dart';
 import 'package:discoverly/data/database.dart';
 import 'package:discoverly/data/item_repository.dart';
+import 'package:discoverly/data/photo_store.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +12,12 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   late AppDatabase db;
   late ItemRepository repo;
+  late Directory tmp;
+  late PhotoStore photos;
 
-  setUp(() {
+  setUp(() async {
+    tmp = await Directory.systemTemp.createTemp('widget_test');
+    photos = PhotoStore(tmp);
     db = AppDatabase(
       DatabaseConnection(
         NativeDatabase.memory(),
@@ -20,10 +27,13 @@ void main() {
     repo = ItemRepository(db);
   });
 
-  tearDown(() => db.close());
+  tearDown(() async {
+    await db.close();
+    await tmp.delete(recursive: true);
+  });
 
   Future<void> pumpApp(WidgetTester tester) async {
-    await tester.pumpWidget(WdipitApp(repository: repo));
+    await tester.pumpWidget(WdipitApp(repository: repo, photos: photos));
     await tester.pumpAndSettle();
   }
 
@@ -104,5 +114,22 @@ void main() {
 
     expect(find.text('Nothing stored yet'), findsOneWidget);
     expect(await repo.getAll(), isEmpty);
+  });
+
+  testWidgets('items with a photo show it in the list and detail', (
+    tester,
+  ) async {
+    await repo.add(
+      name: 'Tent',
+      location: 'Loft',
+      photoPath: 'photos/missing.jpg',
+    );
+    await pumpApp(tester);
+
+    expect(find.byType(Image), findsOneWidget);
+
+    await tester.tap(find.text('Tent'));
+    await tester.pumpAndSettle();
+    expect(find.bySemanticsLabel('Photo of Tent'), findsOneWidget);
   });
 }

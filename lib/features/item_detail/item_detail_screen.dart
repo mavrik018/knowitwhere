@@ -5,6 +5,7 @@ import '../../app_scope.dart';
 import '../../data/database.dart';
 import '../../util/relative_date.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/item_photo.dart';
 
 class ItemDetailScreen extends StatefulWidget {
   const ItemDetailScreen({super.key, required this.itemId});
@@ -99,6 +100,22 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         children: [
+          if (item.photoPath case final photoPath?) ...[
+            Hero(
+              tag: 'photo-${item.id}',
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: AspectRatio(
+                  aspectRatio: 4 / 3,
+                  child: ItemPhoto(
+                    file: AppScope.of(context).photos.resolve(photoPath),
+                    semanticLabel: 'Photo of ${item.name}',
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
           Semantics(
             header: true,
             child: Text(item.name, style: theme.textTheme.headlineMedium),

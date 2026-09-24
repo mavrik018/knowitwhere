@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../app_scope.dart';
 import '../../data/database.dart';
+import '../../widgets/item_photo.dart';
 
 /// A "name → location" row on the home list.
 class ItemCard extends StatelessWidget {
@@ -24,7 +26,7 @@ class ItemCard extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                const _Thumbnail(),
+                _Thumbnail(item: item),
                 const SizedBox(width: 14),
                 Expanded(
                   child: Column(
@@ -71,19 +73,34 @@ class ItemCard extends StatelessWidget {
 }
 
 class _Thumbnail extends StatelessWidget {
-  const _Thumbnail();
+  const _Thumbnail({required this.item});
+
+  final Item item;
+
+  static const _size = 56.0;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return Container(
-      width: 56,
-      height: 56,
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
+    final photoPath = item.photoPath;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: SizedBox.square(
+        dimension: _size,
+        child: photoPath == null
+            ? ColoredBox(
+                color: scheme.surfaceContainerHighest,
+                child: Icon(Icons.inventory_2_outlined, color: scheme.primary),
+              )
+            : Hero(
+                tag: 'photo-${item.id}',
+                child: ItemPhoto(
+                  file: AppScope.of(context).photos.resolve(photoPath),
+                  cacheWidth: (_size * MediaQuery.devicePixelRatioOf(context))
+                      .round(),
+                ),
+              ),
       ),
-      child: Icon(Icons.inventory_2_outlined, color: scheme.primary),
     );
   }
 }
