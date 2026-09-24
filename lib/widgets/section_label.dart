@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../theme/app_theme.dart';
 
@@ -18,10 +19,10 @@ class SectionLabel extends StatelessWidget {
       child: Align(
         alignment: Alignment.centerLeft,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
           decoration: BoxDecoration(
             color: AppPalette.of(context).chip,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8.r),
           ),
           child: Text(
             label.toUpperCase(),
@@ -48,7 +49,7 @@ class Eyebrow extends StatelessWidget {
       text.toUpperCase(),
       style: theme.textTheme.labelMedium?.copyWith(
         color: AppPalette.of(context).accentText,
-        fontSize: 13.5,
+        fontSize: 13.sp,
       ),
     );
   }

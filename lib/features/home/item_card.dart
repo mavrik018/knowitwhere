@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/semantics.dart';
 
 import '../../data/database.dart';
@@ -28,29 +29,30 @@ class ItemBoardCard extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(26),
+          borderRadius: BorderRadius.circular(22.r),
           boxShadow: _cardShadow(theme),
         ),
         child: Material(
           type: MaterialType.transparency,
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(26),
+            borderRadius: BorderRadius.circular(22.r),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(10, 12, 10, 14),
+              padding: EdgeInsets.fromLTRB(8.w, 10.h, 8.w, 12.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   PinnedPhoto(
                     item: item,
-                    aspectRatio: 1.05,
+                    aspectRatio: 1.25,
+                    radius: 16,
                     heroTag: 'photo-${item.id}',
                     cacheWidth: (220 * MediaQuery.devicePixelRatioOf(context))
                         .round(),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 10.h),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    padding: EdgeInsets.symmetric(horizontal: 4.w),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -60,7 +62,7 @@ class ItemBoardCard extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 3.h),
                         _LocationLine(item.location),
                       ],
                     ),
@@ -106,36 +108,36 @@ class ItemCard extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(18.r),
           boxShadow: _cardShadow(theme),
         ),
         child: Material(
           type: MaterialType.transparency,
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(18.r),
             child: Padding(
-              padding: const EdgeInsets.all(10),
+              padding: EdgeInsets.all(8.r),
               child: Row(
                 children: [
                   SizedBox(
-                    width: 56,
+                    width: 48.r,
                     child: PinnedPhoto(
                       item: item,
-                      radius: 14,
+                      radius: 12,
                       heroTag: 'photo-${item.id}',
-                      cacheWidth: (56 * MediaQuery.devicePixelRatioOf(context))
+                      cacheWidth: (48 * MediaQuery.devicePixelRatioOf(context))
                           .round(),
                     ),
                   ),
-                  const SizedBox(width: 14),
+                  SizedBox(width: 12.w),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(item.name, style: theme.textTheme.titleMedium),
                         if (showLocation) ...[
-                          const SizedBox(height: 3),
+                          SizedBox(height: 2.h),
                           _LocationLine(item.location, maxLines: 2),
                         ],
                       ],
@@ -143,6 +145,7 @@ class ItemCard extends StatelessWidget {
                   ),
                   Icon(
                     Icons.chevron_right,
+                    size: 22.r,
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ],
@@ -161,8 +164,8 @@ List<BoxShadow> _cardShadow(ThemeData theme) =>
     : const [
         BoxShadow(
           color: Color(0x14000000),
-          blurRadius: 18,
-          offset: Offset(0, 6),
+          blurRadius: 14,
+          offset: Offset(0, 4),
         ),
       ];
 
@@ -178,11 +181,15 @@ class _LocationLine extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(top: 2),
-          child: Icon(Icons.place_outlined, size: 17, color: AppColors.orange),
+        Padding(
+          padding: EdgeInsets.only(top: 1.h),
+          child: Icon(
+            Icons.place_outlined,
+            size: 15.r,
+            color: AppColors.orange,
+          ),
         ),
-        const SizedBox(width: 4),
+        SizedBox(width: 3.w),
         Expanded(
           child: Text(
             location,

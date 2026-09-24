@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../data/database.dart';
 import '../../theme/app_theme.dart';
@@ -14,7 +15,7 @@ class ItemActions {
   final void Function(Item item) delete;
 }
 
-const _pagePadding = EdgeInsets.symmetric(horizontal: 20);
+EdgeInsets get _pagePadding => EdgeInsets.symmetric(horizontal: 20.w);
 
 /// Board view: two-column pinned-photo cards grouped by recency. Falls back
 /// to one column at large text sizes so names stay readable.
@@ -31,7 +32,7 @@ List<Widget> boardSlivers(
         padding: _pagePadding,
         sliver: SliverList.separated(
           itemCount: (section.items.length / columns).ceil(),
-          separatorBuilder: (_, _) => const SizedBox(height: 14),
+          separatorBuilder: (_, _) => SizedBox(height: 12.h),
           itemBuilder: (context, row) {
             final cells = section.items.skip(row * columns).take(columns);
             return IntrinsicHeight(
@@ -39,7 +40,7 @@ List<Widget> boardSlivers(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   for (final (i, item) in cells.indexed) ...[
-                    if (i > 0) const SizedBox(width: 14),
+                    if (i > 0) SizedBox(width: 12.w),
                     Expanded(
                       child: ItemBoardCard(
                         item: item,
@@ -49,7 +50,7 @@ List<Widget> boardSlivers(
                     ),
                   ],
                   if (cells.length < columns) ...[
-                    const SizedBox(width: 14),
+                    SizedBox(width: 12.w),
                     const Expanded(child: SizedBox()),
                   ],
                 ],
@@ -85,7 +86,7 @@ List<Widget> resultSlivers(List<Item> results, ItemActions actions) => [
 ];
 
 Widget _sectionHeader(Widget child) => SliverPadding(
-  padding: const EdgeInsets.fromLTRB(20, 22, 20, 12),
+  padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 10.h),
   sliver: SliverToBoxAdapter(child: child),
 );
 
@@ -97,7 +98,7 @@ Widget _rows(
   padding: _pagePadding,
   sliver: SliverList.separated(
     itemCount: items.length,
-    separatorBuilder: (_, _) => const SizedBox(height: 10),
+    separatorBuilder: (_, _) => SizedBox(height: 8.h),
     itemBuilder: (context, i) {
       final item = items[i];
       return Dismissible(
@@ -132,18 +133,18 @@ class _LocationHeader extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 2),
-            child: Icon(Icons.place, color: AppColors.orange),
+          Padding(
+            padding: EdgeInsets.only(top: 1.h),
+            child: Icon(Icons.place, size: 20.r, color: AppColors.orange),
           ),
-          const SizedBox(width: 6),
+          SizedBox(width: 6.w),
           Expanded(child: Text(location, style: theme.textTheme.titleLarge)),
-          const SizedBox(width: 8),
+          SizedBox(width: 8.w),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
             decoration: BoxDecoration(
               color: AppPalette.of(context).chip,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(8.r),
             ),
             child: Text('$count', style: theme.textTheme.labelMedium),
           ),
@@ -161,10 +162,10 @@ class _DeleteBackground extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       alignment: Alignment.centerRight,
-      padding: const EdgeInsets.only(right: 24),
+      padding: EdgeInsets.only(right: 20.w),
       decoration: BoxDecoration(
         color: scheme.error,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18.r),
       ),
       child: Icon(Icons.delete_outline, color: scheme.onError),
     );

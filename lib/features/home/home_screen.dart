@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app_scope.dart';
@@ -90,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ],
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20, 28, 20, 0),
+                    padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 0),
                     sliver: SliverToBoxAdapter(
                       child: SmartTip(
                         day: DateTime.now().millisecondsSinceEpoch ~/ 86400000,
@@ -98,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ],
-                const SliverToBoxAdapter(child: SizedBox(height: 120)),
+                SliverToBoxAdapter(child: SizedBox(height: 100.h)),
               ],
             );
           },
@@ -107,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         tooltip: 'Add item',
         onPressed: () => context.push('/add'),
-        child: const Icon(Icons.add_rounded, size: 34),
+        child: const Icon(Icons.add_rounded),
       ),
     );
   }
@@ -115,11 +116,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _topBar(BuildContext context) {
     final query = _search.text;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+      padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 0),
       child: Row(
         children: [
           const _LogoTile(),
-          const SizedBox(width: 12),
+          SizedBox(width: 10.w),
           Expanded(
             child: TextField(
               controller: _search,
@@ -129,11 +130,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 hintText: 'Where is my…',
                 prefixIcon: const Icon(Icons.search_rounded),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(24.r),
                   borderSide: BorderSide.none,
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(24.r),
                   borderSide: const BorderSide(
                     color: AppColors.orange,
                     width: 2,
@@ -161,12 +162,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return MediaQuery.withClampedTextScaling(
       maxScaleFactor: 1.5,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 28, 20, 4),
+        padding: EdgeInsets.fromLTRB(20.w, 22.h, 20.w, 4.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Eyebrow('Your home, remembered'),
-            const SizedBox(height: 8),
+            SizedBox(height: 6.h),
             Semantics(
               header: true,
               child: Text(
@@ -187,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _tabs(BuildContext context, int count) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
+      padding: EdgeInsets.fromLTRB(20.w, 18.h, 20.w, 0),
       child: Row(
         children: [
           for (final (view, label, icon) in [
@@ -201,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
               selected: _view == view,
               onTap: () => setState(() => _view = view),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: 8.w),
           ],
         ],
       ),
@@ -217,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return [
         SliverToBoxAdapter(
           child: EmptyState(
-            illustration: const Mascot(height: 140),
+            illustration: Mascot(height: 110.h),
             title: 'No match for "$query"',
             message: 'Try a shorter word, or add it as a new item.',
           ),
@@ -235,23 +236,23 @@ class _LogoTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ExcludeSemantics(
       child: Container(
-        width: 56,
-        height: 56,
+        width: 48.r,
+        height: 48.r,
         decoration: BoxDecoration(
           color: AppColors.orange,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(14.r),
           boxShadow: const [
             BoxShadow(
               color: Color(0x40F4632A),
-              blurRadius: 14,
-              offset: Offset(0, 6),
+              blurRadius: 10,
+              offset: Offset(0, 4),
             ),
           ],
         ),
-        child: const Icon(
+        child: Icon(
           Icons.inventory_2_outlined,
           color: Colors.white,
-          size: 28,
+          size: 24.r,
         ),
       ),
     );
@@ -290,12 +291,12 @@ class _TabChip extends StatelessWidget {
           onTap: onTap,
           customBorder: const StadiumBorder(),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 13),
+            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(icon, size: 19, color: fg),
-                const SizedBox(width: 8),
+                Icon(icon, size: 18.r, color: fg),
+                SizedBox(width: 6.w),
                 Text(
                   label,
                   style: theme.textTheme.titleSmall?.copyWith(
@@ -318,16 +319,16 @@ class _EmptyHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+      padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 0),
       child: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(24.r),
         ),
         child: Column(
           children: [
             EmptyState(
-              illustration: const Mascot(height: 170),
+              illustration: Mascot(height: 130.h),
               title: 'Nothing stored yet',
               message: 'Add the first thing you want to be able to find later.',
               action: FilledButton.icon(

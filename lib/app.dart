@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 import 'app_scope.dart';
@@ -54,6 +55,9 @@ GoRouter buildRouter({
     ),
   ],
 );
+
+/// ScreenUtil design canvas (logical pixels).
+const designSize = Size(411, 914);
 
 class KnowItWhereApp extends StatefulWidget {
   const KnowItWhereApp({
@@ -111,12 +115,20 @@ class _KnowItWhereAppState extends State<KnowItWhereApp> {
     return AppScope(
       repository: widget.repository,
       photos: widget.photos,
-      child: MaterialApp.router(
-        title: 'knowitwhere',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.light(),
-        darkTheme: AppTheme.dark(),
-        routerConfig: _router,
+      // Sizes in the app are authored against a 411×914 design and scaled
+      // to the device with .w / .h / .r / .sp. The theme is built inside the
+      // builder so it can use them.
+      child: ScreenUtilInit(
+        designSize: designSize,
+        minTextAdapt: true,
+        splitScreenMode: true,
+        builder: (context, _) => MaterialApp.router(
+          title: 'knowitwhere',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light(),
+          darkTheme: AppTheme.dark(),
+          routerConfig: _router,
+        ),
       ),
     );
   }
