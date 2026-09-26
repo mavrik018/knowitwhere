@@ -11,16 +11,29 @@ import 'features/home/home_screen.dart';
 import 'features/item_detail/item_detail_screen.dart';
 import 'features/item_form/item_form_screen.dart';
 import 'features/onboarding/onboarding_screen.dart';
+import 'layout/dialog_page.dart';
+import 'layout/window_size.dart';
 import 'platform/deep_links.dart';
 import 'theme/app_theme.dart';
 
 /// Routes mirror the Phase 3 deep links: `knowitwhere://add`, `knowitwhere://item/{id}`.
 /// `/welcome` is the first-launch onboarding.
+///
+/// On wide windows (iPad) Add and Edit open as centred modal cards, and on
+/// expanded windows an item link opens in the home screen's side inspector
+/// (`/?item={id}`) instead of a separate page.
 GoRouter buildRouter({
   String initialLocation = '/',
   VoidCallback? onOnboardingDone,
 }) => GoRouter(
   initialLocation: initialLocation,
+  redirect: (context, state) {
+    final match = _itemPath.firstMatch(state.uri.path);
+    if (match == null || WindowSize.of(context) != WindowSize.expanded) {
+      return null;
+    }
+    return Uri(path: '/', queryParameters: {'item': match[1]!}).toString();
+  },
   routes: [
     GoRoute(
       path: '/welcome',
@@ -33,31 +46,44 @@ GoRouter buildRouter({
     ),
     GoRoute(
       path: '/',
-      builder: (context, state) => const HomeScreen(),
+      builder: (context, state) =>
+          HomeScreen(selectedItemId: state.uri.queryParameters['item']),
       routes: [
         GoRoute(
           path: 'add',
-          builder: (context, state) => const ItemFormScreen(),
+          pageBuilder: (context, state) =>
+              adaptivePage(context, state.pageKey, const ItemFormScreen()),
         ),
         GoRoute(
           path: 'item/:id',
           builder: (context, state) =>
               ItemDetailScreen(itemId: state.pathParameters['id']!),
-          routes: [
-            GoRoute(
-              path: 'edit',
-              builder: (context, state) =>
-                  ItemFormScreen(itemId: state.pathParameters['id']!),
-            ),
-          ],
+        ),
+        // Top level (not under item/:id) so editing from the iPad inspector
+        // doesn't build a detail page underneath the modal.
+        GoRoute(
+          path: 'edit/:id',
+          pageBuilder: (context, state) => adaptivePage(
+            context,
+            state.pageKey,
+            ItemFormScreen(itemId: state.pathParameters['id']!),
+          ),
         ),
       ],
     ),
   ],
 );
 
-/// ScreenUtil design canvas (logical pixels).
+final _itemPath = RegExp(r'^/item/([^/]+)$');
+
+/// ScreenUtil design canvas for phones (logical pixels).
 const designSize = Size(411, 914);
+
+/// Phones scale from the 411×914 design. Wide windows use their own size as
+/// the design size, so ScreenUtil runs at 1.0 and nothing is blown up: iPad
+/// gets phone-sized type and touch targets in a tablet layout instead.
+Size designSizeFor(Size window) =>
+    WindowSize.ofWidth(window.width).isWide ? window : designSize;
 
 class KnowItWhereApp extends StatefulWidget {
   const KnowItWhereApp({
@@ -119,15 +145,15 @@ class _KnowItWhereAppState extends State<KnowItWhereApp> {
       // to the device with .w / .h / .r / .sp. The theme is built inside the
       // builder so it can use them.
       child: ScreenUtilInit(
-        designSize: designSize,
+        designSize: designSizeFor(MediaQuery.sizeOf(context)),
         minTextAdapt: true,
         splitScreenMode: true,
         builder: (context, _) => MaterialApp.router(
           title: 'knowitwhere',
           debugShowCheckedModeBanner: false,
           themeMode: ThemeMode.light,
-          theme: AppTheme.light(),
-          darkTheme: AppTheme.light(),
+          theme: AppTheme.light(wide: WindowSize.of(context).isWide),
+          darkTheme: AppTheme.light(wide: WindowSize.of(context).isWide),
           routerConfig: _router,
         ),
       ),

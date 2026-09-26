@@ -16,12 +16,16 @@ class ItemBoardCard extends StatelessWidget {
     required this.onTap,
     this.onDelete,
     this.tiltAngle = 0.0,
+    this.selected = false,
   });
 
   final Item item;
   final VoidCallback onTap;
   final VoidCallback? onDelete;
   final double tiltAngle;
+
+  /// Highlighted as the item open in the iPad inspector.
+  final bool selected;
 
   @override
   Widget build(BuildContext context) {
@@ -63,8 +67,10 @@ class ItemBoardCard extends StatelessWidget {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(6.r),
                   border: Border.all(
-                    color: const Color(0x1F000000),
-                    width: 0.8,
+                    color: selected
+                        ? AppColors.orange
+                        : const Color(0x1F000000),
+                    width: selected ? 2.5 : 0.8,
                   ),
                   boxShadow: _polaroidShadow(theme),
                 ),
@@ -154,6 +160,7 @@ class ItemCard extends StatelessWidget {
     required this.onTap,
     this.onDelete,
     this.showLocation = true,
+    this.selected = false,
   });
 
   final Item item;
@@ -164,6 +171,9 @@ class ItemCard extends StatelessWidget {
 
   /// Off in the Locations view, where the group header already says it.
   final bool showLocation;
+
+  /// Highlighted as the item open in the iPad inspector.
+  final bool selected;
 
   static const deleteAction = CustomSemanticsAction(label: 'Delete');
 
@@ -176,8 +186,13 @@ class ItemCard extends StatelessWidget {
       onDelete: onDelete,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerLowest,
+          color: selected
+              ? AppPalette.of(context).accentSoft
+              : theme.colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(18.r),
+          border: selected
+              ? Border.all(color: AppColors.orange, width: 2)
+              : null,
           boxShadow: _cardShadow(theme),
         ),
         child: Material(

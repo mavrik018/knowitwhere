@@ -41,37 +41,50 @@ class OnboardingScreen extends StatelessWidget {
                     child: ConstrainedBox(
                       constraints: BoxConstraints(minHeight: height),
                       child: IntrinsicHeight(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              _HeroTitle(fontSize: titleSize),
-                              const Spacer(),
-                              SizedBox(
-                                height: stageHeight,
-                                child: const _MascotStage(),
+                        // On iPad keep the phone composition in a centred
+                        // column; narrower screens are unaffected.
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 560),
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(
+                                24,
+                                20,
+                                24,
+                                24,
                               ),
-                              const SizedBox(height: 24),
-                              FilledButton(
-                                onPressed: onDone,
-                                // Pinned so theme changes don't alter onboarding.
-                                style: FilledButton.styleFrom(
-                                  minimumSize: const Size.fromHeight(56),
-                                  textStyle: Theme.of(context)
-                                      .textTheme
-                                      .labelLarge
-                                      ?.copyWith(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  _HeroTitle(fontSize: titleSize),
+                                  const Spacer(),
+                                  SizedBox(
+                                    height: stageHeight,
+                                    child: const _MascotStage(),
                                   ),
-                                ),
-                                child: const Text('Get started'),
+                                  const SizedBox(height: 24),
+                                  FilledButton(
+                                    onPressed: onDone,
+                                    // Pinned so theme changes don't alter onboarding.
+                                    style: FilledButton.styleFrom(
+                                      minimumSize: const Size.fromHeight(56),
+                                      textStyle: Theme.of(context)
+                                          .textTheme
+                                          .labelLarge
+                                          ?.copyWith(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(18),
+                                      ),
+                                    ),
+                                    child: const Text('Get started'),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
