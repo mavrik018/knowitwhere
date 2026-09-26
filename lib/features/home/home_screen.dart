@@ -4,19 +4,25 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import '../../app_scope.dart';
 import '../../data/database.dart';
+import '../../layout/window_size.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/mascot.dart';
 import '../../widgets/section_label.dart';
 import '../search/search_filter.dart';
 import 'grouping.dart';
+import 'home_search_field.dart';
 import 'home_views.dart';
 import 'smart_tip.dart';
+import 'tablet_home.dart';
 
 enum HomeView { board, list, locations }
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.selectedItemId});
+
+  /// Item to open in the iPad inspector, from a deep link (`/?item={id}`).
+  final String? selectedItemId;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -27,6 +33,24 @@ class _HomeScreenState extends State<HomeScreen> {
   final _searchFocusNode = FocusNode();
   Stream<List<Item>>? _items;
   HomeView _view = HomeView.board;
+
+  /// Item open in the inspector on expanded (iPad landscape) windows.
+  String? _selectedId;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedId = widget.selectedItemId;
+  }
+
+  @override
+  void didUpdateWidget(HomeScreen old) {
+    super.didUpdateWidget(old);
+    if (widget.selectedItemId != null &&
+        widget.selectedItemId != old.selectedItemId) {
+      _selectedId = widget.selectedItemId;
+    }
+  }
 
   @override
   void didChangeDependencies() {
@@ -66,15 +90,78 @@ class _HomeScreenState extends State<HomeScreen> {
       );
   }
 
+  /// Expanded windows open items in the side inspector; everything else
+  /// pushes the detail page.
+  void _open(Item item) {
+    _searchFocusNode.unfocus();
+    if (WindowSize.of(context) == WindowSize.expanded) {
+      setState(() => _selectedId = item.id);
+    } else {
+      context.push('/item/${item.id}');
+    }
+  }
+
+  void _closeInspector() {
+    setState(() => _selectedId = null);
+    // Drop a deep-linked `?item=` so the same link can open it again later.
+    if (widget.selectedItemId != null) context.go('/');
+  }
+
+  void _add() {
+    _searchFocusNode.unfocus();
+    context.push('/add');
+  }
+
+  /// Escape closes the inspector first, then clears the search.
+  void _escape() {
+    if (_selectedId != null && WindowSize.of(context) == WindowSize.expanded) {
+      _closeInspector();
+    } else if (_search.text.isNotEmpty) {
+      setState(_search.clear);
+    } else {
+      _searchFocusNode.unfocus();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final actions = ItemActions(
-      open: (item) {
-        _searchFocusNode.unfocus();
-        context.push('/item/${item.id}');
+    final actions = ItemActions(open: _open, delete: _delete);
+    final windowSize = WindowSize.of(context);
+    // Hardware keyboard shortcuts, as in iPadOS system apps.
+    return CallbackShortcuts(
+      bindings: {
+        for (final meta in [true, false]) ...{
+          SingleActivator(LogicalKeyboardKey.keyF, meta: meta, control: !meta):
+              _searchFocusNode.requestFocus,
+          SingleActivator(LogicalKeyboardKey.keyN, meta: meta, control: !meta):
+              _add,
+        },
+        const SingleActivator(LogicalKeyboardKey.escape): _escape,
       },
-      delete: _delete,
+      child: Focus(
+        autofocus: true,
+        child: windowSize.isWide
+            ? StreamBuilder<List<Item>>(
+                stream: _items,
+                builder: (context, snapshot) => TabletHome(
+                  windowSize: windowSize,
+                  items: snapshot.data,
+                  search: _search,
+                  searchFocusNode: _searchFocusNode,
+                  onSearchChanged: () => setState(() {}),
+                  view: _view,
+                  onViewChanged: (view) => setState(() => _view = view),
+                  selectedId: _selectedId,
+                  actions: actions,
+                  onCloseInspector: _closeInspector,
+                ),
+              )
+            : _phone(context, actions),
+      ),
     );
+  }
+
+  Widget _phone(BuildContext context, ItemActions actions) {
     return GestureDetector(
       excludeFromSemantics: true,
       onTap: () => _searchFocusNode.unfocus(),
@@ -98,7 +185,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (all == null)
                         const SliverToBoxAdapter(child: SizedBox.shrink())
                       else if (query.isNotEmpty)
-                        ..._searchSlivers(filterItems(all, query), query, actions)
+                        ..._searchSlivers(
+                          filterItems(all, query),
+                          query,
+                          actions,
+                        )
                       else ...[
                         SliverToBoxAdapter(child: _header(context)),
                         if (all.isEmpty)
@@ -106,7 +197,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         else ...[
                           SliverToBoxAdapter(child: _tabs(context, all.length)),
                           ...switch (_view) {
-                            HomeView.board => boardSlivers(context, all, actions),
+                            HomeView.board => boardSlivers(
+                              context,
+                              all,
+                              actions,
+                            ),
                             HomeView.list => indexSlivers(all, actions),
                             HomeView.locations => locationSlivers(all, actions),
                           },
@@ -116,7 +211,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           sliver: SliverToBoxAdapter(
                             child: SmartTip(
                               day:
-                                  DateTime.now().millisecondsSinceEpoch ~/ 86400000,
+                                  DateTime.now().millisecondsSinceEpoch ~/
+                                  86400000,
                             ),
                           ),
                         ),
@@ -129,10 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             floatingActionButton: FloatingActionButton(
               tooltip: 'Add item',
-              onPressed: () {
-                _searchFocusNode.unfocus();
-                context.push('/add');
-              },
+              onPressed: _add,
               child: const Icon(Icons.add_rounded),
             ),
           ),
@@ -142,7 +235,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _topBar(BuildContext context) {
-    final query = _search.text;
     return Padding(
       padding: EdgeInsets.fromLTRB(20.w, 10.h, 20.w, 0),
       child: Row(
@@ -150,33 +242,10 @@ class _HomeScreenState extends State<HomeScreen> {
           const _LogoTile(),
           SizedBox(width: 10.w),
           Expanded(
-            child: TextField(
+            child: HomeSearchField(
               controller: _search,
               focusNode: _searchFocusNode,
-              onChanged: (_) => setState(() {}),
-              textInputAction: TextInputAction.search,
-              decoration: InputDecoration(
-                hintText: 'Where is my…',
-                prefixIcon: const Icon(Icons.search_rounded),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14.r),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14.r),
-                  borderSide: const BorderSide(
-                    color: AppColors.orange,
-                    width: 2,
-                  ),
-                ),
-                suffixIcon: query.isEmpty
-                    ? null
-                    : IconButton(
-                        tooltip: 'Clear search',
-                        icon: Icon(Icons.cancel_rounded, size: 20.r),
-                        onPressed: () => setState(() => _search.clear()),
-                      ),
-              ),
+              onChanged: () => setState(() {}),
             ),
           ),
         ],

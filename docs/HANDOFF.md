@@ -39,7 +39,8 @@ Siri extension  ──┴─ read-only from the App Group JSON via ios/KnowItWhe
 | --- | --- |
 | `lib/data/` | Drift DB (`database.dart`, generated `database.g.dart` committed), `item_repository.dart` (mutations call `ItemChangeSink`), `photo_store.dart` |
 | `lib/platform/` | `shared_cache.dart` (App Group writer), `spotlight.dart`, `deep_links.dart` |
-| `lib/features/` | `home/` (Board / Index / Locations, search), `item_form/`, `item_detail/`, `onboarding/` |
+| `lib/features/` | `home/` (Board / Index / Locations, search; `tablet_home.dart` is the iPad shell), `item_form/`, `item_detail/` (`item_inspector.dart` is the iPad side pane), `onboarding/` |
+| `lib/layout/` | iPad support: `window_size.dart` (compact / medium / expanded by window width), `dialog_page.dart` (Add/Edit as modal cards), `hover_lift.dart` (pointer hover) |
 | `lib/theme/app_theme.dart` | Cream / ink / orange tokens; `AppPalette` extension; iOS HIG type scale in `.sp` (ScreenUtil design size 411×914, set in `lib/app.dart`) |
 | `ios/Runner/` | `SpotlightPlugin.swift`, `Runner.entitlements` (App Group), `Info.plist` (usage strings, URL scheme) |
 | `ios/KnowItWhereKit/` | Swift package: `KnowItWhereCore` (cache reader, `ItemMatcher`, `VoiceCopy`, `DeepLink`), `KnowItWhereWidgetUI` (the widget), `KnowItWhereIntents` (`FindItemLocationIntent`). XCTests in `Tests/` |
@@ -134,6 +135,14 @@ If the GUI isn't available, an alternative is scripting the targets with the `xc
 8. If the one-sentence phrase proves unreliable on the device, switch the advertised phrase in the three Dart files back to "Hey Siri, find something in knowitwhere" and say so in the PR.
 
 ## Task 3: Widget and Spotlight polish on the device (Claude + user)
+
+**iPad check (also here):** run on an iPad or the iPad simulator and verify:
+- Landscape: sidebar, 4-column board, and a tapped item opens in the right-hand inspector
+- Portrait: navigation rail and a 3-column board; items open as a two-column page
+- Split View / Slide Over: at 1/3 width the phone layout appears, at 1/2 width the rail layout
+- Magic Keyboard: ⌘N opens Add, ⌘F focuses search, Esc closes the inspector or the Add/Edit card; cards lift on trackpad hover
+- Previews of every layout are in `docs/screens/ipad_*.png`
+
 
 Check the widget in light and dark mode, both sizes, at large Dynamic Type, and with an empty state. Check that Spotlight shows items and that a tap opens the detail screen, including when the app is closed (cold start). Fix whatever turns up. Record results in issue #19.
 

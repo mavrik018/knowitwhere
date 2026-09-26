@@ -9,6 +9,8 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../app_scope.dart';
 import '../../data/database.dart';
+import '../../layout/dialog_page.dart';
+import '../../layout/window_size.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/item_photo.dart';
@@ -106,28 +108,36 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
 
   Future<void> _pickPhoto() async {
     final picker = ImagePicker();
-    final source = await showModalBottomSheet<ImageSource>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (picker.supportsImageSource(ImageSource.camera))
-              ListTile(
-                leading: const Icon(Icons.photo_camera_outlined),
-                title: const Text('Take photo'),
-                onTap: () => Navigator.pop(context, ImageSource.camera),
-              ),
-            ListTile(
-              leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('Choose from library'),
-              onTap: () => Navigator.pop(context, ImageSource.gallery),
-            ),
-          ],
+    Widget options(BuildContext context) => Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (picker.supportsImageSource(ImageSource.camera))
+          ListTile(
+            leading: const Icon(Icons.photo_camera_outlined),
+            title: const Text('Take photo'),
+            onTap: () => Navigator.pop(context, ImageSource.camera),
+          ),
+        ListTile(
+          leading: const Icon(Icons.photo_library_outlined),
+          title: const Text('Choose from library'),
+          onTap: () => Navigator.pop(context, ImageSource.gallery),
         ),
-      ),
+      ],
     );
+    // A full-width bottom sheet looks wrong on iPad; use a small dialog.
+    final source = WindowSize.of(context).isWide
+        ? await showDialog<ImageSource>(
+            context: context,
+            builder: (context) => SimpleDialog(
+              title: const Text('Add a photo'),
+              children: [options(context)],
+            ),
+          )
+        : await showModalBottomSheet<ImageSource>(
+            context: context,
+            showDragHandle: true,
+            builder: (context) => SafeArea(child: options(context)),
+          );
     if (source == null) return;
     try {
       // Downscale natively first; PhotoStore enforces the 1 MB cap (FR3.3).
@@ -163,7 +173,11 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_isEdit ? 'Edit item' : 'Add item')),
+      appBar: AppBar(
+        title: Text(_isEdit ? 'Edit item' : 'Add item'),
+        // Inside the iPad modal card, close rather than go back.
+        leading: isInDialog(context) ? const CloseButton() : null,
+      ),
       body: _buildBody(context),
     );
   }

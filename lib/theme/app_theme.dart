@@ -76,7 +76,9 @@ class AppPalette extends ThemeExtension<AppPalette> {
 }
 
 abstract final class AppTheme {
-  static ThemeData light() => _build(
+  /// [wide] is true on iPad-width windows (floating snackbars get a fixed
+  /// width instead of spanning the whole screen).
+  static ThemeData light({bool wide = false}) => _build(
     ColorScheme.fromSeed(
       seedColor: AppColors.orange,
       brightness: Brightness.light,
@@ -94,12 +96,17 @@ abstract final class AppTheme {
       error: AppColors.danger,
     ),
     AppPalette.light,
+    wide: wide,
   );
 
   /// Always use the light soft orange theme across the app.
-  static ThemeData dark() => light();
+  static ThemeData dark({bool wide = false}) => light(wide: wide);
 
-  static ThemeData _build(ColorScheme scheme, AppPalette palette) {
+  static ThemeData _build(
+    ColorScheme scheme,
+    AppPalette palette, {
+    bool wide = false,
+  }) {
     final base = ThemeData(
       colorScheme: scheme,
       fontFamily: 'Poppins',
@@ -280,6 +287,7 @@ abstract final class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
+        width: wide ? 420 : null,
         backgroundColor: AppColors.ink,
         actionTextColor: AppColors.orange,
         contentTextStyle: text.bodyMedium?.copyWith(

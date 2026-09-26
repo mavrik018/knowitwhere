@@ -44,6 +44,13 @@ void main() {
       'roboto-black.ttf',
     ]);
     await _loadFont('MaterialIcons', ['materialicons-regular.otf']);
+    // The app's own font (pubspec `fonts:`); tests don't load it by default.
+    final poppins = FontLoader('Poppins');
+    for (final weight in ['Regular', 'Medium', 'SemiBold', 'Bold', 'Italic']) {
+      final bytes = File('assets/fonts/Poppins-$weight.ttf').readAsBytesSync();
+      poppins.addFont(Future.value(ByteData.view(bytes.buffer)));
+    }
+    await poppins.load();
   });
 
   setUp(() async {
@@ -83,9 +90,15 @@ void main() {
     clock = DateTime.now();
   }
 
-  Future<void> pump(WidgetTester tester, {bool onboarding = false}) async {
-    tester.view.physicalSize = const Size(393 * 2, 852 * 2);
-    tester.view.devicePixelRatio = 2;
+  /// Phone: iPhone 15 (393×852). iPad: pass [size], e.g. [ipadLandscape].
+  Future<void> pump(
+    WidgetTester tester, {
+    bool onboarding = false,
+    Size size = const Size(393, 852),
+    double pixelRatio = 2,
+  }) async {
+    tester.view.physicalSize = size * pixelRatio;
+    tester.view.devicePixelRatio = pixelRatio;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
       KnowItWhereApp(
@@ -152,6 +165,48 @@ void main() {
     await tester.tap(find.byTooltip('Add item'));
     await tester.pumpAndSettle();
     await shot(tester, '9_add');
+  });
+
+  // iPad Air 11" (1180×820 landscape = expanded; 820×1180 portrait = medium).
+  const ipadLandscape = Size(1180, 820);
+  const ipadPortrait = Size(820, 1180);
+
+  screenTest('ipad onboarding', (tester) async {
+    await pump(tester, onboarding: true, size: ipadLandscape, pixelRatio: 1.5);
+    await shot(tester, 'ipad_0_onboarding');
+  });
+
+  screenTest('ipad empty', (tester) async {
+    await pump(tester, size: ipadLandscape, pixelRatio: 1.5);
+    await shot(tester, 'ipad_1_empty');
+  });
+
+  screenTest('ipad landscape: board, inspector, index, add', (tester) async {
+    await seed(tester);
+    await pump(tester, size: ipadLandscape, pixelRatio: 1.5);
+    await shot(tester, 'ipad_2_board');
+
+    await tester.tap(find.text('Spare Keys'));
+    await tester.pumpAndSettle();
+    await shot(tester, 'ipad_3_inspector');
+
+    await tester.tap(find.text('Index'));
+    await tester.pumpAndSettle();
+    await shot(tester, 'ipad_4_index');
+
+    await tester.tap(find.byTooltip('Add item (⌘N)'));
+    await tester.pumpAndSettle();
+    await shot(tester, 'ipad_5_add');
+  });
+
+  screenTest('ipad portrait: board and detail', (tester) async {
+    await seed(tester);
+    await pump(tester, size: ipadPortrait, pixelRatio: 1.5);
+    await shot(tester, 'ipad_6_portrait_board');
+
+    await tester.tap(find.text('Spare Keys'));
+    await tester.pumpAndSettle();
+    await shot(tester, 'ipad_7_portrait_detail');
   });
 }
 
