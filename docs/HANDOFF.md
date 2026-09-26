@@ -59,6 +59,23 @@ Siri extension  ──┴─ read-only from the App Group JSON via ios/KnowItWhe
 - **The user tests on a device only once everything is built.** Don't block on manual testing. Collect items for the final pass (Task 7).
 - Code style: match the surrounding code; comments explain *why*; tests alongside changes.
 
+## Current state (as of 2026-09-26)
+
+- **Done and on `main`:**
+  - The offline Flutter app, with the redesigned UI (orange, squirrel, polaroid board, Poppins)
+  - Responsive phone sizing (ScreenUtil 411×914) and native iPad layouts (sidebar / rail / inspector)
+  - App Group write-through, deep links, Spotlight
+  - The Swift package for the widget and Siri, tested on CI
+  - Public pages in `site/`, App Store copy, and the squirrel app icon
+- **Not done (the tasks below):**
+  - The Xcode widget and Siri targets (Task 1)
+  - The one-sentence Siri phrase (Task 2)
+  - Device checks on iPhone and iPad (Tasks 3 and 5)
+  - Screenshots (Task 4)
+  - Public pages going live (Task 6)
+  - Submission (Task 7)
+- **Previews of every screen:** `docs/screens/` (phone `1_…9_`, iPad `ipad_*`)
+
 ## 3. First-time setup on the Mac
 
 ```bash
@@ -104,7 +121,9 @@ If the GUI isn't available, an alternative is scripting the targets with the `xc
 
 ## Task 2: One-sentence Siri phrase (Claude)
 
-**Goal (agreed with the user):** "Hey Siri, **where's my passport in knowitwhere**?" → spoken location, with no follow-up question and no app launch. The onboarding and detail screens already advertise this phrase (`lib/widgets/siri_bar.dart`, `lib/features/home/smart_tip.dart`, `lib/features/item_detail/item_detail_screen.dart`).
+**Goal (agreed with the user):** "Hey Siri, **where's my passport in KnowItWhere**?" → spoken location, with no follow-up question and no app launch. The smart tip and the item detail screen already advertise this phrase (`lib/widgets/siri_bar.dart`, `lib/features/home/smart_tip.dart`, `lib/features/item_detail/item_detail_screen.dart`). The onboarding screen no longer shows it.
+
+**App name for Siri:** the UI says "KnowItWhere", but `CFBundleDisplayName` in `ios/Runner/Info.plist` is still `knowitwhere`. Siri matches `\(.applicationName)` against the display name when spoken, so casing doesn't matter to Siri, but ask the user which spelling the home screen should show and make Info.plist, `docs/app-store.md` and `site/` consistent.
 
 **Why it needs new work:** App Shortcut phrases can only contain `AppEntity`/`AppEnum` parameters, never a free `String`. The current `FindItemLocationIntent` takes a String, so Siri has to ask a follow-up question. Read `docs/siri-voice-ux.md`.
 
@@ -130,7 +149,7 @@ If the GUI isn't available, an alternative is scripting the targets with the `xc
    Pick the option Apple's docs support for iOS 17+, document the choice in `docs/siri-voice-ux.md`, and keep FR5.3 (no app launch).
 6. **Tests:** XCTests for `ItemEntityQuery.entities(matching:)` (uses the matcher, returns ≤ 1) and for the new voice copy. `swift test` must pass, and the `Swift kit` CI must be green.
 7. **Device check with the user:**
-   - Say "Hey Siri, where's my passport in knowitwhere?" with and without "my", and with a fuzzy name ("hitmi cable").
+   - Say "Hey Siri, where's my passport in KnowItWhere?" with and without "my", and with a fuzzy name ("hitmi cable").
    - Add a new item, then ask for it straight away (checks that Siri's names update).
 8. If the one-sentence phrase proves unreliable on the device, switch the advertised phrase in the three Dart files back to "Hey Siri, find something in knowitwhere" and say so in the PR.
 
@@ -149,6 +168,8 @@ Check the widget in light and dark mode, both sizes, at large Dynamic Type, and 
 ## Task 4: App Store screenshots (Claude + user)
 
 **Issue:** #21. Run the app on the **iPhone 16 Pro Max / 6.9" simulator** (1320×2868). Seed realistic items with photos, set dark or light mode deliberately, and capture with `xcrun simctl io booted screenshot <file>.png`. Follow the caption plan in `docs/app-store.md` (onboarding hero, board, Siri, widget, detail). Put the files in `docs/app-store-screenshots/`. Captioned marketing frames are optional.
+
+**iPad screenshots are required too**, because the app supports iPad (`TARGETED_DEVICE_FAMILY = "1,2"`). Use the **iPad Pro 13" simulator** (2064×2752 portrait or 2752×2064 landscape). Show landscape with the sidebar and inspector open, and portrait with the rail. `docs/screens/ipad_*.png` shows the intended compositions.
 
 ## Task 5: Final manual test pass (user, guided by Claude)
 
