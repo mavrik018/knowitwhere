@@ -1,30 +1,63 @@
 # Siri voice UX (SRS Phase 1.4, FR5)
 
-Siri "find" runs `FindItemLocationIntent` in the App Intents extension. It reads the App Group shared cache, matches the spoken name, and **answers out loud without opening the app**. The copy lives in code in `ios/KnowItWhereKit/Sources/KnowItWhereCore/VoiceCopy.swift` and is covered by `VoiceCopyTests`.
+Siri answers "where is it?" out loud **without opening the app** (FR5.3). Two intents in `ios/KnowItWhereKit/Sources/KnowItWhereIntents/` do this; both read the App Group shared cache:
+
+- `WhereIsItemIntent`: one sentence, with the item name in the phrase
+- `FindItemLocationIntent`: the fallback. Siri asks for the name
+
+The copy lives in code in `ios/KnowItWhereKit/Sources/KnowItWhereCore/VoiceCopy.swift` and is covered by `VoiceCopyTests`.
 
 ## Conversation
 
 ```
-You:   Hey Siri, find something in knowitwhere
+You:   Hey Siri, where's my passport in KnowItWhere?
+Siri:  Passport is here: Desk, top drawer.
+```
+
+Fallback, for anything Siri doesn't recognise as a saved item name:
+
+```
+You:   Hey Siri, find something in KnowItWhere
 Siri:  What are you looking for?
 You:   My passport
 Siri:  Passport is here: Desk, top drawer.
 ```
 
-### Why Siri has to ask a follow-up question
+### How the one-sentence phrase works
 
-iOS only lets App Shortcut phrases contain parameters that are app-defined types (`AppEntity`/`AppEnum`), never free text. FR5.2 asks for a free-text spoken name, so a phrase can't carry the item name. Siri asks for it instead. The answer is still spoken and no screen opens, so the "zero screens" part of the success criterion holds. The one-shot phrase ("Where's my passport in knowitwhere") is a Phase 5 experiment. See below.
+App Shortcut phrases can only contain app-defined parameter types (`AppEntity`/`AppEnum`), never free text. So each saved item is an `ItemEntity` (id, name, location), and `ItemEntityQuery`:
+
+- `suggestedEntities()` returns every item, most recent first. Siri learns the names it listens for from this list.
+- `entities(matching:)` runs `ItemMatcher` on what Siri heard and returns **at most one** item. v1 never asks Siri to disambiguate (SRS §9).
+- `entities(for:)` looks items up by id.
+
+`WhereIsItemIntent.perform()` re-reads the item by id, so an edit since Siri last fetched names is reflected. An item deleted in the meantime gets the not-found answer.
+
+### Keeping Siri's names current
+
+Siri only knows the names it last fetched, so the app calls `KnowItWhereShortcuts.updateAppShortcutParameters()` after every add, edit and delete, and at launch. In Dart, `SiriSink` (`lib/platform/siri.dart`) runs after `SharedCacheSink`, so the cache is up to date when Siri reads it. It calls `refresh` on the `knowitwhere/siri` channel, which `SiriShortcutsPlugin` in `ios/Runner/KnowItWhereShortcuts.swift` handles.
+
+**Why the intents run in the app, not an App Intents extension:** the app can only call `updateAppShortcutParameters()` on a provider it contains. Apple DTS's guidance is that the `AppShortcutsProvider` and the intents it uses must be in the main app target for this ([developer forums](https://developer.apple.com/forums/thread/759160)). An extension has no way to learn that items changed. So `KnowItWhereShortcuts` is in Runner, and Runner links `KnowItWhereIntents` and includes it via `AppIntentsPackage`. With `openAppWhenRun = false`, iOS runs the intent in the background without bringing the app to the foreground. The Flutter engine starts with the window scene, so a Siri request doesn't start Dart.
 
 ## Trigger phrases
 
-Every phrase must contain the app name (an iOS rule). These are registered by the `AppShortcutsProvider` in the intents extension:
+Every phrase must contain the app name (an iOS rule). They are registered by `KnowItWhereShortcuts` in `ios/Runner/KnowItWhereShortcuts.swift`.
 
-- "Find something in knowitwhere"
-- "Where did I put something in knowitwhere"
-- "Ask knowitwhere where something is"
-- "knowitwhere, find an item"
+One sentence (`{item}` is a saved item's name):
 
-Users can also run the intent from the Shortcuts app, or give it a personal phrase.
+- "Where's my {item} in KnowItWhere"
+- "Where is my {item} in KnowItWhere"
+- "Where did I put my {item} in KnowItWhere"
+- "Find my {item} in KnowItWhere"
+
+Fallback:
+
+- "Find something in KnowItWhere"
+- "Where did I put something in KnowItWhere"
+- "Ask KnowItWhere where something is"
+- "KnowItWhere, find an item"
+
+Users can also run either intent from the Shortcuts app, or give it a personal phrase.
 
 ## Responses
 
@@ -34,7 +67,7 @@ Users can also run the intent from the Shortcuts app, or give it a personal phra
 | Found (exact, substring or fuzzy) | "**{name}** is here: **{location}**." | location |
 | Found, several equally good matches | "{name} is here: {location}. That's the most recent of {n} matches." | location |
 | No match | "I couldn't find anything matching "{what Siri heard}"." | "" |
-| No items saved yet | "You haven't saved anything in knowitwhere yet." | "" |
+| No items saved yet (fallback phrase only) | "You haven't saved anything in KnowItWhere yet." | "" |
 
 Notes:
 
@@ -55,7 +88,8 @@ Notes:
 
 Known risk (SRS §11): close names such as "charger" / "charger 2". An exact match always beats a substring match, so both are reachable by saying the full name.
 
-## Phase 5 experiments
+## Device checks
 
-- **One-shot phrase:** model items as an `AppEntity` with an `EntityStringQuery` backed by `ItemMatcher`. Then phrases like "Where's my \(item) in knowitwhere" become possible, but the app has to call `updateAppShortcutParameters()` whenever items change. Test on a device whether Siri recognises user-created names reliably before adopting it.
-- Try the phrasings people actually use ("where's my…", "where did I leave…", "find my…") and tune the filler-word list.
+- The one-sentence phrase with and without "my", and with a fuzzy name ("hitmi cable")
+- Add a new item, then ask for it straight away (checks that Siri's names update)
+- If the one-sentence phrase proves unreliable on the device, switch the phrase advertised in `lib/widgets/siri_bar.dart`, `lib/features/home/smart_tip.dart` and `lib/features/item_detail/item_detail_screen.dart` back to "Hey Siri, find something in KnowItWhere"

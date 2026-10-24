@@ -19,5 +19,6 @@ let package = Package(
     .target(name: "KnowItWhereWidgetUI", dependencies: ["KnowItWhereCore"]),
     .target(name: "KnowItWhereIntents", dependencies: ["KnowItWhereCore"]),
     .testTarget(name: "KnowItWhereCoreTests", dependencies: ["KnowItWhereCore"]),
+    .testTarget(name: "KnowItWhereIntentsTests", dependencies: ["KnowItWhereIntents"]),
   ]
 )

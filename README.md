@@ -18,8 +18,8 @@ Full requirements: [docs/SRS.md](docs/SRS.md) (written under the working title "
 | --- | --- |
 | Main app | Flutter (Dart), Drift (SQLite) as source of truth |
 | Photos | `image_picker`, stored in the app's Documents dir (relative paths only) |
-| Widget | SwiftUI Widget Extension (code in `ios/KnowItWhereKit`) |
-| Siri | App Intents Extension, Tier 2 "find" (code in `ios/KnowItWhereKit`) |
+| Widget | SwiftUI Widget Extension `KnowItWhereWidgetExtension` (code in `ios/KnowItWhereKit`) |
+| Siri | App Intents in the app target: one-sentence "where's my {item}" plus a "find" fallback (code in `ios/KnowItWhereKit`) |
 | System search | Core Spotlight (`ios/Runner/SpotlightPlugin.swift`) |
 | Bridge | App Group shared JSON cache via `home_widget` |
 | Deep links | `app_links` → `go_router` |
@@ -34,7 +34,7 @@ Fully offline. No network calls, accounts, or analytics.
 | 1 | Design | 🟡 Voice UX done; architecture, screen and widget designs await sign-off |
 | 2 | Core Flutter app (FR1–FR3) | ✅ Done |
 | 3 | Shared data layer, App Group, deep links | ✅ Done |
-| 4 | Native widget, Siri, Spotlight | 🟡 Spotlight done; widget + Siri code ready in `ios/KnowItWhereKit`, targets need a Mac ([guide](docs/phase-4-xcode-setup.md)) |
+| 4 | Native widget, Siri, Spotlight | 🟡 Built ([setup](docs/phase-4-xcode-setup.md)); device check pending |
 | 5 | Testing & QA | 🟡 Unit, integration and automated accessibility tests done; device testing pending |
 | 6 | Release prep | 🟡 Icon, listing copy, privacy answers, reviewer notes done; screenshots, public privacy/support URLs pending |
 | 7 | Post-launch | ⏳ |
@@ -99,14 +99,14 @@ Extensions only read this — the Drift database stays private to the app.
 - Public pages (privacy, support) in [site/](site), published by the Pages workflow once the repo is public
 - [Screen previews](docs/screens): rendered by `flutter test tool/screenshots/screenshots_test.dart --update-goldens`
 - [Siri voice UX](docs/siri-voice-ux.md): phrases, spoken copy, matching
-- [Phase 4 Xcode setup](docs/phase-4-xcode-setup.md): adding the widget and Siri targets on a Mac
+- [Phase 4 Xcode setup](docs/phase-4-xcode-setup.md): the widget target and in-app Siri wiring
 - [App Store submission](docs/app-store.md): listing, keywords, privacy, reviewer notes
 
 ### Signing (Mac)
 
-Set your team under *Signing & Capabilities* for each target. Automatic signing
-registers the App Group `group.com.AandMapps.knowitwhere`; every target (app,
-widget, intents extension) must list the same group.
+Both targets (app and widget) use team `PUS7W2V7BL` with automatic signing,
+which registers the App Group `group.com.AandMapps.knowitwhere`; both must
+list the same group.
 
 ## Contributing
 
