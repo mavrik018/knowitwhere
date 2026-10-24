@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../app_scope.dart';
 import '../../data/database.dart';
+import '../../data/item_repository.dart';
 import '../../layout/dialog_page.dart';
 import '../../layout/window_size.dart';
 import '../../theme/app_theme.dart';
@@ -42,6 +43,24 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
 
   /// Newly picked photo (absolute temp path), copied into the store on save.
   String? _pickedPath;
+
+  /// Another item already using the typed name. Names are unique so search
+  /// and Siri never have to guess between two "Passport"s.
+  Item? _duplicate;
+
+  @override
+  void initState() {
+    super.initState();
+    _name.addListener(_clearDuplicateIfRenamed);
+  }
+
+  void _clearDuplicateIfRenamed() {
+    final duplicate = _duplicate;
+    if (duplicate != null &&
+        normalizeName(_name.text) != normalizeName(duplicate.name)) {
+      setState(() => _duplicate = null);
+    }
+  }
 
   @override
   void didChangeDependencies() {
@@ -77,6 +96,19 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
     if (_saving || !_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
     final scope = AppScope.of(context);
+    final duplicate = await scope.repository.findByName(
+      _name.text,
+      exceptId: widget.itemId,
+    );
+    if (!mounted) return;
+    if (duplicate != null) {
+      setState(() {
+        _duplicate = duplicate;
+        _saving = false;
+      });
+      _formKey.currentState!.validate();
+      return;
+    }
     try {
       final photoPath = _pickedPath != null
           ? await scope.photos.save(_pickedPath!)
@@ -219,8 +251,21 @@ class _ItemFormScreenState extends State<ItemFormScreen> {
                 },
               ),
             ),
-            validator: (v) => _required(v, 'Give it a name'),
+            validator: (v) =>
+                _required(v, 'Give it a name') ??
+                (_duplicate == null
+                    ? null
+                    : 'Already saved, in ${_duplicate!.location}'),
           ),
+          if (_duplicate case final duplicate?)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: () => context.go('/edit/${duplicate.id}'),
+                icon: const Icon(Icons.edit_outlined),
+                label: Text('Edit the saved "${duplicate.name}" instead'),
+              ),
+            ),
           SizedBox(height: 12.h),
           TextFormField(
             controller: _location,

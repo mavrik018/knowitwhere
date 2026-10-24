@@ -33,6 +33,11 @@ class CompositeItemChangeSink implements ItemChangeSink {
   }
 }
 
+/// The form of a name used to spot duplicates: "  Passport " and
+/// "passport" are the same item.
+String normalizeName(String name) =>
+    name.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+
 class ItemRepository {
   ItemRepository(
     this._db, {
@@ -99,9 +104,26 @@ class ItemRepository {
   }
 
   /// Re-inserts a previously deleted item unchanged.
-  Future<void> restore(Item item) async {
+  ///
+  /// Returns false, and restores nothing, if another item with the same name
+  /// was saved in the meantime: names are unique so Siri's answer is too.
+  Future<bool> restore(Item item) async {
+    if (await findByName(item.name, exceptId: item.id) != null) return false;
     await _db.into(_db.items).insertOnConflictUpdate(item);
     await publishSnapshot();
+    return true;
+  }
+
+  /// The item called [name], ignoring case and extra spaces, other than
+  /// [exceptId] (the item being edited). Used to keep names unique.
+  Future<Item?> findByName(String name, {String? exceptId}) async {
+    final wanted = normalizeName(name);
+    for (final item in await getAll()) {
+      if (item.id != exceptId && normalizeName(item.name) == wanted) {
+        return item;
+      }
+    }
+    return null;
   }
 
   /// Pushes the current full list to the sink, e.g. at launch so the shared

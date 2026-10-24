@@ -70,6 +70,46 @@ void main() {
     expect(find.text('Desk drawer'), findsOneWidget);
   });
 
+  testWidgets(
+    'a name that is already saved is refused, with a way to edit it',
+    (tester) async {
+      await repo.add(name: 'Passport', location: 'Desk drawer');
+      await pumpApp(tester);
+
+      await tester.tap(find.byTooltip('Add item'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextFormField).at(0), ' passport ');
+      await tester.enterText(find.byType(TextFormField).at(1), 'Safe');
+      await scrollAndTap(tester, find.text('Save item'));
+
+      expect(find.text('Already saved, in Desk drawer'), findsOneWidget);
+      expect(await repo.getAll(), hasLength(1));
+
+      await tester.tap(find.text('Edit the saved "Passport" instead'));
+      await tester.pumpAndSettle();
+      expect(find.text('Edit item'), findsOneWidget);
+      expect(find.text('Desk drawer'), findsOneWidget);
+    },
+  );
+
+  testWidgets('renaming clears the duplicate warning', (tester) async {
+    await repo.add(name: 'Passport', location: 'Desk drawer');
+    await pumpApp(tester);
+
+    await tester.tap(find.byTooltip('Add item'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextFormField).at(0), 'Passport');
+    await tester.enterText(find.byType(TextFormField).at(1), 'Safe');
+    await scrollAndTap(tester, find.text('Save item'));
+    expect(find.text('Already saved, in Desk drawer'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextFormField).at(0), 'Old passport');
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Edit the saved'), findsNothing);
+    await scrollAndTap(tester, find.text('Save item'));
+    expect(await repo.getAll(), hasLength(2));
+  });
+
   testWidgets('search filters live and shows a distinct no-results state', (
     tester,
   ) async {

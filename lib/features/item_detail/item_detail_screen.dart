@@ -11,6 +11,7 @@ import '../../theme/app_theme.dart';
 import '../../widgets/pinned_photo.dart';
 import '../../widgets/section_label.dart';
 import '../../widgets/siri_bar.dart';
+import '../../widgets/undo_delete.dart';
 
 class ItemDetailScreen extends StatefulWidget {
   const ItemDetailScreen({super.key, required this.itemId});
@@ -272,23 +273,5 @@ Future<void> confirmDeleteItem(
   if (confirmed != true || !context.mounted) return;
   beforeDelete?.call();
   await repo.delete(item.id);
-  messenger
-    ..clearSnackBars()
-    ..showSnackBar(
-      SnackBar(
-        duration: const Duration(seconds: 3),
-        content: Text(
-          'Deleted "${item.name}"',
-          style: const TextStyle(
-            color: Color(0xFFFBF8F2),
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        action: SnackBarAction(
-          label: 'Undo',
-          textColor: AppColors.orange,
-          onPressed: () => repo.restore(item),
-        ),
-      ),
-    );
+  showDeletedSnackBar(messenger, repo, item);
 }
