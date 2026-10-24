@@ -90,12 +90,14 @@ void main() {
     clock = DateTime.now();
   }
 
-  /// Phone: iPhone 15 (393×852). iPad: pass [size], e.g. [ipadLandscape].
+  /// Phone: iPhone 16 Pro Max (440×956 @ 3x = 1320×2868).
+  /// (Use 430×932 @ 3x for 1290×2796 if targeting 6.7" iPhone 15 Pro Max).
+  /// iPad: pass [size] and [pixelRatio], e.g. [ipadLandscape] or [ipadPortrait].
   Future<void> pump(
     WidgetTester tester, {
     bool onboarding = false,
-    Size size = const Size(393, 852),
-    double pixelRatio = 2,
+    Size size = const Size(440, 956),
+    double pixelRatio = 3.0,
   }) async {
     tester.view.physicalSize = size * pixelRatio;
     tester.view.devicePixelRatio = pixelRatio;
@@ -167,23 +169,26 @@ void main() {
     await shot(tester, '9_add');
   });
 
-  // iPad Air 11" (1180×820 landscape = expanded; 820×1180 portrait = medium).
-  const ipadLandscape = Size(1180, 820);
-  const ipadPortrait = Size(820, 1180);
+  // iPad Pro 13" (2752×2064 landscape = expanded; 2064×2752 portrait = medium).
+  // Landscape uses native 2x (1376×1032 pt) so width >= 900 triggers the sidebar
+  // and inspector. Portrait uses 2.5x (825.6×1100.8 pt) so width < 900 retains
+  // the tablet medium tier (navigation rail and stacked detail page).
+  const ipadLandscape = Size(1376, 1032);
+  const ipadPortrait = Size(825.6, 1100.8);
 
   screenTest('ipad onboarding', (tester) async {
-    await pump(tester, onboarding: true, size: ipadLandscape, pixelRatio: 1.5);
+    await pump(tester, onboarding: true, size: ipadLandscape, pixelRatio: 2.0);
     await shot(tester, 'ipad_0_onboarding');
   });
 
   screenTest('ipad empty', (tester) async {
-    await pump(tester, size: ipadLandscape, pixelRatio: 1.5);
+    await pump(tester, size: ipadLandscape, pixelRatio: 2.0);
     await shot(tester, 'ipad_1_empty');
   });
 
   screenTest('ipad landscape: board, inspector, index, add', (tester) async {
     await seed(tester);
-    await pump(tester, size: ipadLandscape, pixelRatio: 1.5);
+    await pump(tester, size: ipadLandscape, pixelRatio: 2.0);
     await shot(tester, 'ipad_2_board');
 
     await tester.tap(find.text('Spare Keys'));
@@ -201,7 +206,7 @@ void main() {
 
   screenTest('ipad portrait: board and detail', (tester) async {
     await seed(tester);
-    await pump(tester, size: ipadPortrait, pixelRatio: 1.5);
+    await pump(tester, size: ipadPortrait, pixelRatio: 2.5);
     await shot(tester, 'ipad_6_portrait_board');
 
     await tester.tap(find.text('Spare Keys'));
