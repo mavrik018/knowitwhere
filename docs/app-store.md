@@ -6,7 +6,7 @@ Draft copy and answers for App Store Connect. Field limits are noted where Apple
 
 | Field | Value |
 | --- | --- |
-| Name (30) | knowitwhere |
+| Name (30) | KnowItWhere |
 | Subtitle (30) | Remember where you put things |
 | Bundle ID | com.AandMapps.knowitwhere |
 | Primary category | Productivity |
@@ -28,14 +28,14 @@ where did i put,storage tracker,item finder,inventory,declutter,find my stuff,or
 
 **Description (4000)**
 
-> knowitwhere remembers where you put things, so you don't have to.
+> KnowItWhere remembers where you put things, so you don't have to.
 >
 > Passports, spare keys, cables, warranty papers, the tent in the loft: save what it is and where it went, with a photo if you like. When you need it again, find it in seconds.
 >
 > FIND IT THREE WAYS
 > • Type: live search as you type, best matches first
 > • Glance: a home-screen widget shows what you put away most recently
-> • Ask: "Hey Siri, find something in knowitwhere" — Siri tells you where it is, without opening the app
+> • Ask: "Hey Siri, where's my passport in KnowItWhere?" — Siri tells you where it is, without opening the app
 >
 > FAST TO ADD
 > • Just a name and a place — free text, no folders to set up
@@ -53,7 +53,7 @@ where did i put,storage tracker,item finder,inventory,declutter,find my stuff,or
 
 1. "Never lose it again" (onboarding hero with the squirrel)
 2. "Where is my…?" (home board with photo cards)
-3. "Ask Siri" ("Hey Siri, where's my passport in knowitwhere?" and the spoken answer)
+3. "Ask Siri" ("Hey Siri, where's my passport in KnowItWhere?" and the spoken answer)
 4. "Right on your home screen" (medium widget)
 5. "Private. On your phone only." (detail screen)
 
@@ -81,25 +81,25 @@ The pages live in `site/` and are published by `.github/workflows/pages.yml` onc
 
 ### Entitlements checklist
 
-- [ ] `group.com.AandMapps.knowitwhere` ticked on Runner, the widget extension and the Siri extension
-- [ ] All three share the same team; bundle IDs are `com.AandMapps.knowitwhere`, `…​.KnowItWhereWidgetExtension`, `…​.KnowItWhereSiri`
+- [ ] `group.com.AandMapps.knowitwhere` ticked on Runner and the widget extension (Siri runs inside the app, so there is no Siri extension)
+- [ ] Both share team `PUS7W2V7BL`; bundle IDs are `com.AandMapps.knowitwhere` and `com.AandMapps.knowitwhere.KnowItWhereWidget`
 
 ## Review notes (6.3)
 
 Paste into App Store Connect → App Review Information → Notes:
 
-> knowitwhere stores everything locally; there is no account or login.
+> KnowItWhere stores everything locally; there is no account or login.
 >
 > To test the core flow:
 > 1. Open the app and tap "Add item". Enter "Passport" as the name and "Desk drawer" as the location, then tap "Save item".
 > 2. Type "pass" in the search field. The item appears.
 >
 > To test Siri (the main feature; please test on a device with Siri enabled):
-> 1. After step 1 above, say: "Hey Siri, find something in knowitwhere".
-> 2. Siri asks "What are you looking for?". Say: "Passport".
-> 3. Expected: Siri says "Passport is here: Desk drawer." The app does not open.
+> 1. After step 1 above, say: "Hey Siri, where's my passport in KnowItWhere?"
+> 2. Expected: Siri says "Passport is here: Desk drawer." The app does not open.
+> 3. Alternatively, say "Hey Siri, find something in KnowItWhere". Siri asks "What are you looking for?"; say "Passport" and Siri gives the same answer.
 >
-> The same action is available in the Shortcuts app as "Find an Item".
+> Both actions are also available in the Shortcuts app ("Where Is It?" and "Find an Item").
 >
 > To test the widget: add the "Recent items" widget from the home-screen widget gallery. It shows saved items; tapping one opens it in the app.
 >

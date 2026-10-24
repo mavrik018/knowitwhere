@@ -3,10 +3,14 @@ import Foundation
 /// What Siri says (SRS Phase 1.4, docs/siri-voice-ux.md).
 public enum VoiceCopy {
   public static let askForItem = "What are you looking for?"
-  public static let nothingSaved = "You haven't saved anything in knowitwhere yet."
+  public static let nothingSaved = "You haven't saved anything in KnowItWhere yet."
+
+  public static func found(item: SharedItem) -> String {
+    "\(item.name) is here: \(sentence(item.location))"
+  }
 
   public static func found(_ match: ItemMatch) -> String {
-    var text = "\(match.item.name) is here: \(sentence(match.item.location))"
+    var text = found(item: match.item)
     if match.otherMatches > 0 {
       text += " That's the most recent of \(match.otherMatches + 1) matches."
     }
@@ -27,6 +31,18 @@ public enum VoiceCopy {
       return (notFound(query), nil)
     }
     return (found(match), match.item.location)
+  }
+
+  /// The answer for an item Siri already resolved (one-sentence phrase).
+  /// Looked up by id so an edit since Siri last fetched names is reflected;
+  /// an item deleted in the meantime is reported as not found.
+  public static func answer(itemId: String, name: String, items: [SharedItem]) -> (
+    spoken: String, location: String?
+  ) {
+    guard let item = items.first(where: { $0.id == itemId }) else {
+      return (notFound(name), nil)
+    }
+    return (found(item: item), item.location)
   }
 
   /// Ends the text with exactly one full stop.

@@ -45,6 +45,24 @@ final class VoiceCopyTests: XCTestCase {
   func testNothingSavedYet() {
     XCTAssertEqual(
       VoiceCopy.answer(query: "passport", items: []).spoken,
-      "You haven't saved anything in knowitwhere yet.")
+      "You haven't saved anything in KnowItWhere yet.")
+  }
+
+  func testAnswerForResolvedItemUsesTheCurrentLocation() {
+    let moved = SharedItem(
+      id: "1", name: "Passport", location: "Safe", updatedAt: Date(timeIntervalSince1970: 200))
+    let answer = VoiceCopy.answer(itemId: "1", name: "Passport", items: [moved])
+    XCTAssertEqual(answer.spoken, "Passport is here: Safe.")
+    XCTAssertEqual(answer.location, "Safe")
+  }
+
+  func testAnswerForDeletedItemIsNotFound() {
+    let answer = VoiceCopy.answer(itemId: "gone", name: "Tent", items: [passport])
+    XCTAssertEqual(answer.spoken, "I couldn't find anything matching \"Tent\".")
+    XCTAssertNil(answer.location)
+  }
+
+  func testFoundItem() {
+    XCTAssertEqual(VoiceCopy.found(item: passport), "Passport is here: Desk, top drawer.")
   }
 }

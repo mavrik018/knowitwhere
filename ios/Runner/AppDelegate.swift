@@ -15,5 +15,8 @@ import UIKit
     if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "SpotlightPlugin") {
       SpotlightPlugin.register(with: registrar)
     }
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "SiriShortcutsPlugin") {
+      SiriShortcutsPlugin.register(with: registrar)
+    }
   }
 }
