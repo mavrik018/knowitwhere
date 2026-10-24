@@ -57,7 +57,14 @@ where did i put,storage tracker,item finder,inventory,declutter,find my stuff,or
 4. "Right on your home screen" (medium widget)
 5. "Private. On your phone only." (detail screen)
 
-Draft renders of the in-app screens are in `docs/screens/`.
+Upload-ready renders are in `docs/app-store-screenshots/`: iPhone 6.9" at 1320×2868, and iPad 13" at 2752×2064 (landscape) or 2064×2752 (portrait), as RGB PNGs with no alpha channel (App Store Connect rejects screenshots with one). Siri and the widget are system UI, so take those two on a device. To regenerate after a UI change:
+
+```bash
+flutter test tool/screenshots/screenshots_test.dart --update-goldens   # docs/screens (RGBA previews)
+swift tool/screenshots/flatten_for_app_store.swift docs/screens/*.png docs/app-store-screenshots
+```
+
+The greeting on the home screen follows the time of day ("Good afternoon"), so render at a sensible hour.
 
 ## App Privacy (6.2)
 
