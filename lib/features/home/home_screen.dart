@@ -6,6 +6,7 @@ import '../../app_scope.dart';
 import '../../data/database.dart';
 import '../../layout/window_size.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/undo_delete.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/mascot.dart';
 import '../../widgets/section_label.dart';
@@ -69,25 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final repo = AppScope.of(context).repository;
     final messenger = ScaffoldMessenger.of(context);
     await repo.delete(item.id);
-    messenger
-      ..clearSnackBars()
-      ..showSnackBar(
-        SnackBar(
-          duration: const Duration(seconds: 3),
-          content: Text(
-            'Deleted "${item.name}"',
-            style: const TextStyle(
-              color: Color(0xFFFBF8F2),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          action: SnackBarAction(
-            label: 'Undo',
-            textColor: AppColors.orange,
-            onPressed: () => repo.restore(item),
-          ),
-        ),
-      );
+    showDeletedSnackBar(messenger, repo, item);
   }
 
   /// Expanded windows open items in the side inspector; everything else

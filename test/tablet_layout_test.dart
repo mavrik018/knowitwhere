@@ -199,6 +199,39 @@ void main() {
     expect(find.text('KnowItWhere'), findsNothing);
   });
 
+  // A phone turned sideways for the camera, or an iPad window resized
+  // across a breakpoint, must not swap the Add page for a modal card: the
+  // swap rebuilt the form and wiped what was typed and the picked photo.
+  testWidgets('resizing the window keeps an open Add form', (tester) async {
+    final links = StreamController<Uri>();
+    addTearDown(links.close);
+    await pumpAt(tester, slideOver, deepLinks: links.stream);
+    links.add(Uri.parse('knowitwhere://add'));
+    await tester.pumpAndSettle();
+
+    final fields = find.byType(TextFormField);
+    await tester.enterText(fields.at(0), 'Passport');
+    await tester.enterText(fields.at(1), 'Desk drawer');
+
+    tester.view.physicalSize = landscape * 2;
+    await tester.pumpAndSettle();
+    expect(find.text('Passport'), findsOneWidget);
+    expect(find.text('Desk drawer'), findsOneWidget);
+
+    tester.view.physicalSize = slideOver * 2;
+    await tester.pumpAndSettle();
+    expect(find.text('Passport'), findsOneWidget);
+
+    // Once closed, the next Add follows the current width again.
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    tester.view.physicalSize = landscape * 2;
+    await tester.pumpAndSettle();
+    links.add(Uri.parse('knowitwhere://add'));
+    await tester.pumpAndSettle();
+    expect(find.byType(CloseButton), findsOneWidget);
+  });
+
   testWidgets('expanded layout meets accessibility guidelines', (tester) async {
     await repo.add(name: 'Passport', location: 'Desk drawer');
     final handle = tester.ensureSemantics();

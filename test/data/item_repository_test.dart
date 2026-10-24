@@ -83,8 +83,28 @@ void main() {
     await repo.delete(item.id);
     expect(await repo.get(item.id), isNull);
 
-    await repo.restore(item);
+    expect(await repo.restore(item), isTrue);
     expect(await repo.get(item.id), item);
+  });
+
+  test(
+    'findByName ignores case and spacing, and the item being edited',
+    () async {
+      final item = await repo.add(name: 'HDMI cable', location: 'TV');
+
+      expect((await repo.findByName('  hdmi   CABLE '))?.id, item.id);
+      expect(await repo.findByName('HDMI cable', exceptId: item.id), isNull);
+      expect(await repo.findByName('HDMI'), isNull);
+    },
+  );
+
+  test('restore refuses a name that was saved again meanwhile', () async {
+    final item = await repo.add(name: 'Passport', location: 'Desk');
+    await repo.delete(item.id);
+    await repo.add(name: 'passport', location: 'Safe');
+
+    expect(await repo.restore(item), isFalse);
+    expect((await repo.getAll()).map((i) => i.location), ['Safe']);
   });
 
   test('every mutation notifies the sink with the full list', () async {
