@@ -169,12 +169,12 @@ void main() {
     await shot(tester, '9_add');
   });
 
-  // iPad Pro 13" (2752×2064 landscape = expanded; 2064×2752 portrait = medium).
-  // Landscape uses native 2x (1376×1032 pt) so width >= 900 triggers the sidebar
-  // and inspector. Portrait uses 2.5x (825.6×1100.8 pt) so width < 900 retains
-  // the tablet medium tier (navigation rail and stacked detail page).
+  // iPad Pro 13" at its real point size, @2x: 1376×1032 landscape → 2752×2064,
+  // 1032×1376 portrait → 2064×2752 (the App Store 13" sizes). Both are wider
+  // than 900 pt, so both show the expanded layout (sidebar + inspector), just
+  // as the device does. The rail layout only appears in narrower windows.
   const ipadLandscape = Size(1376, 1032);
-  const ipadPortrait = Size(825.6, 1100.8);
+  const ipadPortrait = Size(1032, 1376);
 
   screenTest('ipad onboarding', (tester) async {
     await pump(tester, onboarding: true, size: ipadLandscape, pixelRatio: 2.0);
@@ -206,7 +206,7 @@ void main() {
 
   screenTest('ipad portrait: board and detail', (tester) async {
     await seed(tester);
-    await pump(tester, size: ipadPortrait, pixelRatio: 2.5);
+    await pump(tester, size: ipadPortrait, pixelRatio: 2.0);
     await shot(tester, 'ipad_6_portrait_board');
 
     await tester.tap(find.text('Spare Keys'));
