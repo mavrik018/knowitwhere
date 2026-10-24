@@ -32,6 +32,6 @@ After a build, `build/ios/iphoneos/Runner.app/PlugIns/KnowItWhereWidgetExtension
 
 On a device:
 
-- The widget shows recent items, updates right after an add/edit/delete, a row tap opens that item, and an empty-space tap opens Add
+- The widget shows recent items, updates right after an add/edit/delete, a row tap opens that item, an empty-space tap opens the app, and the medium widget's "+" opens Add
 - "Hey Siri, find something in KnowItWhere" → "What are you looking for?" → "passport" → spoken answer, with no app opened
 - Spotlight: search for an item's name; tapping the result opens its detail screen
