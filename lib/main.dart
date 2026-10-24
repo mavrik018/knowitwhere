@@ -11,6 +11,7 @@ import 'data/database.dart';
 import 'data/item_repository.dart';
 import 'data/photo_store.dart';
 import 'platform/shared_cache.dart';
+import 'platform/siri.dart';
 import 'platform/spotlight.dart';
 
 Future<void> main() async {
@@ -22,7 +23,11 @@ Future<void> main() async {
   final repository = ItemRepository(
     db,
     sink: Platform.isIOS
-        ? const CompositeItemChangeSink([SharedCacheSink(), SpotlightSink()])
+        ? const CompositeItemChangeSink([
+            SharedCacheSink(),
+            SpotlightSink(),
+            SiriSink(),
+          ])
         : const NoopItemChangeSink(),
   );
   final photos = PhotoStore(dir);
