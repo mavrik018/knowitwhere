@@ -134,8 +134,8 @@ No photo reference needed here — widget and Siri are both text-first by design
 
 - **FR4.1** Small/Medium widget shows the 3–5 most recently updated items as name → location rows
 - **FR4.2** Tapping a row deep-links to that item's detail screen (app launches if needed)
-- **FR4.3** Tapping empty widget space deep-links to Add Item
-- **FR4.4** Widget has a graceful empty state ("No items yet — tap to add your first")
+- **FR4.3** Tapping empty widget space opens the app; the medium widget also has a "+" button that deep-links to Add Item (changed after device testing, 2026-10-24)
+- **FR4.4** Widget has a graceful empty state ("Nothing saved yet — tap to add your first"); tapping it deep-links to Add Item
 - **FR4.5** No search, no input, no scrolling inside the widget — display + shortcut only (WidgetKit constraint, and intentional per §1)
 
 ### FR5 — Siri Tier 2: Find (Native App Intent)

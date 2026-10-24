@@ -16,9 +16,12 @@ let package = Package(
   ],
   targets: [
     .target(name: "KnowItWhereCore"),
-    .target(name: "KnowItWhereWidgetUI", dependencies: ["KnowItWhereCore"]),
+    .target(
+      name: "KnowItWhereWidgetUI", dependencies: ["KnowItWhereCore"],
+      resources: [.process("Resources")]),
     .target(name: "KnowItWhereIntents", dependencies: ["KnowItWhereCore"]),
     .testTarget(name: "KnowItWhereCoreTests", dependencies: ["KnowItWhereCore"]),
     .testTarget(name: "KnowItWhereIntentsTests", dependencies: ["KnowItWhereIntents"]),
+    .testTarget(name: "KnowItWhereWidgetUITests", dependencies: ["KnowItWhereWidgetUI"]),
   ]
 )

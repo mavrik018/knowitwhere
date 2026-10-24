@@ -181,7 +181,7 @@ Check the widget in light and dark mode, both sizes, at large Dynamic Type, and 
 
 - [ ] Add, edit, delete (swipe and detail), undo; search on name and location
 - [ ] Photo from the camera and from the library; the photo survives an app restart
-- [ ] Widget: updates immediately after each change; a row opens the item; empty space opens Add
+- [ ] Widget: updates immediately after each change; a row opens the item; empty space opens the app; "+" (medium) opens Add
 - [ ] Siri: one-sentence phrase, follow-up phrase, not-found case, nothing-saved case
 - [ ] Spotlight: search, tap result (app running and app closed)
 - [ ] Airplane mode: everything works
