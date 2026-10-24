@@ -45,6 +45,15 @@
 	<false/>
 	<key>NSSiriUsageDescription</key>
 	<string>Lets you ask Siri where you put something.</string>
+	<key>INAlternativeAppNames</key>
+	<array>
+		<dict>
+			<key>INAlternativeAppName</key>
+			<string>Know It Where</string>
+			<key>INAlternativeAppNamePronunciationHint</key>
+			<string>know it where</string>
+		</dict>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>
