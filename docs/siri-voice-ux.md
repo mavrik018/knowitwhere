@@ -45,10 +45,16 @@ Every phrase must contain the app name (an iOS rule). They are registered by `Kn
 
 One sentence (`{item}` is a saved item's name):
 
+- "Ask KnowItWhere where my {item} is"
+- "Ask KnowItWhere where I put my {item}"
+- "KnowItWhere, where's my {item}"
+- "KnowItWhere, where is my {item}"
+- "Where did I put my {item} in KnowItWhere"
+- "Where did I leave my {item} in KnowItWhere"
 - "Where's my {item} in KnowItWhere"
 - "Where is my {item} in KnowItWhere"
-- "Where did I put my {item} in KnowItWhere"
-- "Find my {item} in KnowItWhere"
+
+There is deliberately no "Find my {item} in KnowItWhere": see *Find My overlap* below.
 
 Fallback:
 
@@ -88,8 +94,15 @@ Notes:
 
 Known risk (SRS §11): close names such as "charger" / "charger 2". An exact match always beats a substring match, so both are reachable by saying the full name.
 
+## Known behaviour from device testing (2026-10-24)
+
+- **First use asks to turn on shortcuts.** The first time a KnowItWhere phrase is spoken, iOS shows a one-time card offering to turn on the app's shortcuts with Siri. After "Turn on", Siri answers, and the card doesn't come back. This is system behaviour and the app can't skip it. Opening the app once after installing makes the phrases available sooner.
+- **Find My overlap.** "Where's my …" and "Find my …" are Find My's own trigger words (AirTags, devices, people). With "in KnowItWhere" at the end, Siri usually picks the app, but now and then it goes to Find My or a web search instead, especially as the first request of a session. Phrases that **start** with the app name ("Ask KnowItWhere where my passport is", "KnowItWhere, where's my passport") or that Find My doesn't own ("Where did I put my passport in KnowItWhere") avoid the collision, so they are listed first.
+- **Recognising the name.** "KnowItWhere" is a made-up word that speech recognition can hear as "know it where". `INAlternativeAppNames` in `ios/Runner/Info.plist` adds "Know It Where" as a synonym, which Apple says App Shortcuts honour.
+
 ## Device checks
 
 - The one-sentence phrase with and without "my", and with a fuzzy name ("hitmi cable")
 - Add a new item, then ask for it straight away (checks that Siri's names update)
-- If the one-sentence phrase proves unreliable on the device, switch the phrase advertised in `lib/widgets/siri_bar.dart`, `lib/features/home/smart_tip.dart` and `lib/features/item_detail/item_detail_screen.dart` back to "Hey Siri, find something in KnowItWhere"
+- Compare "Ask KnowItWhere where my passport is" with "Where's my passport in KnowItWhere", each as the first request after locking the phone
+- If the "Where's my …" form stays unreliable but the "Ask KnowItWhere …" form works, change the advertised phrase to the latter. If neither works reliably, switch the phrase advertised in `lib/widgets/siri_bar.dart`, `lib/features/home/smart_tip.dart` and `lib/features/item_detail/item_detail_screen.dart` back to "Hey Siri, find something in KnowItWhere"
