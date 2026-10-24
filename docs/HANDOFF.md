@@ -59,21 +59,21 @@ Siri extension  ──┴─ read-only from the App Group JSON via ios/KnowItWhe
 - **The user tests on a device only once everything is built.** Don't block on manual testing. Collect items for the final pass (Task 7).
 - Code style: match the surrounding code; comments explain *why*; tests alongside changes.
 
-## Current state (as of 2026-09-26)
+## Current state (as of 2026-10-24)
 
 - **Done and on `main`:**
   - The offline Flutter app, with the redesigned UI (orange, squirrel, polaroid board, Poppins)
   - Responsive phone sizing (ScreenUtil 411×914) and native iPad layouts (sidebar / rail / inspector)
   - App Group write-through, deep links, Spotlight
-  - The Swift package for the widget and Siri, tested on CI
-  - Public pages in `site/`, App Store copy, and the squirrel app icon
-- **Not done (the tasks below):**
-  - The Xcode widget and Siri targets (Task 1)
-  - The one-sentence Siri phrase (Task 2)
-  - Device checks on iPhone and iPad (Tasks 3 and 5)
-  - Screenshots (Task 4)
-  - Public pages going live (Task 6)
+  - The widget extension target `KnowItWhereWidgetExtension` (Task 1, PR #45)
+  - Siri in the app target, including the one-sentence phrase "Where's my {item} in KnowItWhere?" (Task 2, PR #46). There is **no Siri extension**: the app must own the `AppShortcutsProvider` to refresh Siri's item names (see `docs/siri-voice-ux.md`)
+  - Home-screen name `KnowItWhere`; the repo is public and the pages are live (Task 6)
+  - App Store copy and the squirrel app icon
+- **Not done:**
+  - Device checks on iPhone and iPad (Tasks 3 and 5); the user does these
+  - Screenshots (Task 4); the user takes them on a device
   - Submission (Task 7)
+- **Mac setup notes:** Flutter is at `~/Developer/flutter/bin` (not on the tool PATH by default) and is 3.47.x locally while CI pins 3.44.1. `flutter pub get` on 3.47 rewrites `pubspec.lock` and `analysis_options.yaml`, so don't commit those changes. Team `PUS7W2V7BL`, automatic signing.
 - **Previews of every screen:** `docs/screens/` (phone `1_…9_`, iPad `ipad_*`)
 
 ## 3. First-time setup on the Mac
@@ -96,7 +96,9 @@ If all of these pass, start Task 0.
 
 The app icon is the squirrel. The master is `design/app-icon/app-icon-master.png` (1024×1024, no transparency); `python tool/make_app_icon.py` regenerates every iOS size and `site/icon.png`. Don't use `flutter_launcher_icons`: it breaks `ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS` in `project.pbxproj` and adds Android files. The shipping target is iOS only. `android/` exists for the user's local testing on an Android phone; keep it, but don't build Android features or submit to Google Play (out of scope, SRS §9).
 
-## Task 1: Add the widget and Siri extension targets (user + Claude)
+## Task 1: Add the widget and Siri extension targets (done, PR #45)
+
+Done differently from the plan below: the targets were scripted, and Siri runs in the app target instead of an extension. See `docs/phase-4-xcode-setup.md`. Only the device check (step 5) remains, as part of Task 5.
 
 **Issues:** #14, #15, #22. **Read first:** `docs/phase-4-xcode-setup.md`.
 
@@ -119,7 +121,9 @@ The user does the Xcode GUI steps while you guide them one step at a time from t
 
 If the GUI isn't available, an alternative is scripting the targets with the `xcodeproj` Ruby gem. That's riskier, so prefer the GUI.
 
-## Task 2: One-sentence Siri phrase (Claude)
+## Task 2: One-sentence Siri phrase (done, PR #46)
+
+Built as below, with option (a) for refreshing names: the provider is in Runner and `SiriSink` calls `updateAppShortcutParameters()`. The device check (step 7) remains, as part of Task 5.
 
 **Goal (agreed with the user):** "Hey Siri, **where's my passport in KnowItWhere**?" → spoken location, with no follow-up question and no app launch. The smart tip and the item detail screen already advertise this phrase (`lib/widgets/siri_bar.dart`, `lib/features/home/smart_tip.dart`, `lib/features/item_detail/item_detail_screen.dart`). The onboarding screen no longer shows it.
 
@@ -185,7 +189,9 @@ Check the widget in light and dark mode, both sizes, at large Dynamic Type, and 
 - [ ] Largest Dynamic Type: no clipped text on every screen
 - [ ] Backup and restore (optional): items return and the widget and Siri work after a restore
 
-## Task 6: Public pages for App Store Connect (Claude, after the user makes the repo public)
+## Task 6: Public pages for App Store Connect (done 2026-10-24)
+
+The repo is public, Pages deploys from Actions, all three URLs load, and #22 is closed. The support page uses GitHub Issues only (step 4 is still open if a support email is wanted).
 
 The pages are already written in `site/` (`index.html`, `privacy.html`, `support.html`). `.github/workflows/pages.yml` deploys them, but only once the repo is public; free GitHub Pages needs a public repo.
 
