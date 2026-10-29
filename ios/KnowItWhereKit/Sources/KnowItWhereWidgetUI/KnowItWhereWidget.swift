@@ -3,7 +3,7 @@ import SwiftUI
 import WidgetKit
 
 /// Home-screen widget (FR4): the most recently updated items as
-/// name → location cards. Display and shortcut only — no input or scrolling.
+/// name → location rows. Display and shortcut only — no input or scrolling.
 public struct KnowItWhereWidget: Widget {
   public init() {}
 
@@ -78,6 +78,10 @@ public struct ItemsWidgetView: View {
 }
 
 /// The widget body without WidgetKit's container, so previews can render it.
+///
+/// No app-name header: iOS already prints "KnowItWhere" under the widget.
+/// Rows are added only while they fit, so large text shows fewer items
+/// instead of clipping the first and last ones.
 struct ItemsWidgetContent: View {
   let entry: ItemsEntry
   let isSmall: Bool
@@ -90,67 +94,84 @@ struct ItemsWidgetContent: View {
       if entry.items.isEmpty {
         EmptyContent(palette: palette)
       } else if isSmall {
-        VStack(alignment: .leading, spacing: 0) {
-          Header(palette: palette, showsAdd: false, linksEnabled: linksEnabled)
-          Spacer(minLength: 6)
-          VStack(alignment: .leading, spacing: 7) {
-            ForEach(SharedCache.recents(entry.items, limit: 3)) { item in
-              StackedRow(item: item, palette: palette)
-            }
-          }
-          Spacer(minLength: 0)
+        ViewThatFits(in: .vertical) {
+          smallRows(limit: 3)
+          smallRows(limit: 2)
+          smallRows(limit: 1)
         }
       } else {
-        VStack(alignment: .leading, spacing: 8) {
-          Header(palette: palette, showsAdd: true, linksEnabled: linksEnabled)
-          LazyVGrid(
-            columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)],
-            spacing: 8
-          ) {
-            ForEach(SharedCache.recents(entry.items, limit: 4)) { item in
-              WidgetLink(DeepLink.item(item.id), enabled: linksEnabled) {
-                ItemCard(item: item, palette: palette)
-              }
-            }
+        VStack(alignment: .leading, spacing: 4) {
+          MediumHeader(palette: palette, linksEnabled: linksEnabled)
+          ViewThatFits(in: .vertical) {
+            mediumRows(limit: 3)
+            mediumRows(limit: 2)
+            mediumRows(limit: 1)
           }
-          Spacer(minLength: 0)
         }
       }
     }
     .foregroundStyle(palette.text)
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    // Past this, even one row stops fitting; Apple's widgets cap it too.
+    .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+  }
+
+  private func smallRows(limit: Int) -> some View {
+    rows(limit: limit) { StackedRow(item: $0, palette: palette) }
+  }
+
+  private func mediumRows(limit: Int) -> some View {
+    rows(limit: limit) { item in
+      WidgetLink(DeepLink.item(item.id), enabled: linksEnabled) {
+        InlineRow(item: item, palette: palette)
+      }
+    }
+  }
+
+  /// The [limit] most recent items, separated by hairlines.
+  private func rows<Row: View>(limit: Int, @ViewBuilder row: @escaping (SharedItem) -> Row)
+    -> some View
+  {
+    let items = SharedCache.recents(entry.items, limit: limit)
+    return VStack(alignment: .leading, spacing: 0) {
+      ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+        if index > 0 {
+          Rectangle().fill(palette.divider).frame(height: 1)
+        }
+        row(item)
+          .padding(.vertical, 4)
+          // Spread the rows that fit over the full height instead of
+          // leaving a gap at the bottom. ViewThatFits measures ideal
+          // heights, so this doesn't affect how many rows are chosen.
+          .frame(maxHeight: .infinity)
+      }
+    }
   }
 }
 
-/// App mark and name, plus a quick Add button on the medium widget.
-private struct Header: View {
+/// "Recent" and a quick Add button (medium only: small widgets have a single
+/// tap target).
+private struct MediumHeader: View {
   let palette: Palette
-  let showsAdd: Bool
   let linksEnabled: Bool
 
   var body: some View {
-    HStack(spacing: 6) {
-      Image(systemName: "archivebox.fill")
-        .font(.system(size: 10, weight: .bold))
-        .foregroundStyle(.white)
-        .frame(width: 20, height: 20)
-        .background(palette.accent, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
-        .accessibilityHidden(true)
-      Text("KnowItWhere")
-        .font(.caption.weight(.bold))
+    HStack {
+      Text("RECENT")
+        .font(.caption2.weight(.bold))
+        .tracking(0.8)
         .foregroundStyle(palette.accentText)
-        .lineLimit(1)
+        .widgetAccentable()
       Spacer(minLength: 0)
-      if showsAdd {
-        WidgetLink(DeepLink.add, enabled: linksEnabled) {
-          Image(systemName: "plus")
-            .font(.system(size: 12, weight: .bold))
-            .foregroundStyle(.white)
-            .frame(width: 24, height: 24)
-            .background(palette.accent, in: Circle())
-        }
-        .accessibilityLabel("Add item")
+      WidgetLink(DeepLink.add, enabled: linksEnabled) {
+        Image(systemName: "plus")
+          .font(.system(size: 11, weight: .bold))
+          .foregroundStyle(.white)
+          .frame(width: 20, height: 20)
+          .background(palette.accent, in: Circle())
+          .widgetAccentable()
       }
+      .accessibilityLabel("Add item")
     }
   }
 }
@@ -187,31 +208,27 @@ private struct StackedRow: View {
         .lineLimit(1)
       Location(text: item.location, palette: palette)
     }
+    .frame(maxWidth: .infinity, alignment: .leading)
     .accessibilityElement(children: .combine)
     .accessibilityLabel("\(item.name), stored in \(item.location)")
   }
 }
 
-/// Medium widget: a white card per item, like the board's polaroids.
-private struct ItemCard: View {
+/// Medium widget: name and location side by side, like the app's Index.
+private struct InlineRow: View {
   let item: SharedItem
   let palette: Palette
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 2) {
+    HStack(spacing: 8) {
       Text(item.name)
         .font(.subheadline.weight(.semibold))
         .lineLimit(1)
+        .frame(maxWidth: .infinity, alignment: .leading)
       Location(text: item.location, palette: palette)
+        .frame(maxWidth: .infinity, alignment: .trailing)
     }
-    .frame(maxWidth: .infinity, alignment: .leading)
-    .padding(.horizontal, 10)
-    .padding(.vertical, 8)
-    .background(palette.card, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-    .overlay(
-      RoundedRectangle(cornerRadius: 12, style: .continuous)
-        .strokeBorder(palette.cardBorder, lineWidth: 1)
-    )
+    .contentShape(Rectangle())
     .accessibilityElement(children: .combine)
     .accessibilityLabel("\(item.name), stored in \(item.location)")
   }
@@ -226,6 +243,7 @@ private struct Location: View {
       Image(systemName: "mappin")
         .font(.caption2.weight(.bold))
         .foregroundStyle(palette.accent)
+        .widgetAccentable()
       Text(text)
         .font(.caption)
         .foregroundStyle(palette.secondary)
@@ -271,9 +289,8 @@ private struct EmptyContent: View {
 /// Cream / ink / orange, matching the app theme (lib/theme/app_theme.dart).
 struct Palette {
   let background: Color
-  /// Item cards on the medium widget.
-  let card: Color
-  let cardBorder: Color
+  /// Hairlines between rows.
+  let divider: Color
   let text: Color
   let secondary: Color
   /// Icons and fills.
@@ -285,15 +302,13 @@ struct Palette {
     accent = Color(hex: 0xF4632A)
     if scheme == .dark {
       background = Color(hex: 0x1F1B18)
-      card = Color(hex: 0x2A2622)
-      cardBorder = Color(hex: 0x34302B)
+      divider = Color(hex: 0x34302B)
       text = Color(hex: 0xFBF8F2)
       secondary = Color(hex: 0xB7AFA5)
       accentText = Color(hex: 0xFF9A6B)
     } else {
       background = Color(hex: 0xFFF2E6)
-      card = .white
-      cardBorder = Color(hex: 0xF4D4BD)
+      divider = Color(hex: 0xF4D4BD)
       text = Color(hex: 0x261D17)
       secondary = Color(hex: 0x867265)
       accentText = Color(hex: 0xB4430F)
