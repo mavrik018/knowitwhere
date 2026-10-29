@@ -27,17 +27,38 @@ final class WidgetPreviewTests: XCTestCase {
       for (family, size) in [("small", small), ("medium", medium)] {
         for (state, list) in [("items", items), ("empty", [])] {
           let name = "widget_\(family)_\(state)_\(scheme == .dark ? "dark" : "light")"
-          let data = try XCTUnwrap(render(list, isSmall: family == "small", scheme: scheme, size: size), name)
-          XCTAssertGreaterThan(data.count, 0)
-          if let dir = ProcessInfo.processInfo.environment["WIDGET_PREVIEW_DIR"] {
-            try data.write(to: URL(fileURLWithPath: dir).appendingPathComponent("\(name).png"))
-          }
+          try check(name, list, isSmall: family == "small", scheme: scheme, size: size)
         }
       }
     }
   }
 
-  private func render(_ items: [SharedItem], isSmall: Bool, scheme: ColorScheme, size: CGSize) -> Data? {
+  /// Larger text must drop rows, never clip them (the first device build
+  /// cut off the top and bottom rows at a larger text size). macOS ignores
+  /// the Dynamic Type environment, so this squeezes the height instead:
+  /// 30% less room is what 30% larger text needs. Written with a
+  /// "_tight" suffix for comparing by eye; not committed.
+  func testTightHeightRenders() throws {
+    for (family, size) in [("small", small), ("medium", medium)] {
+      try check(
+        "widget_\(family)_items_tight", items, isSmall: family == "small", scheme: .light,
+        size: CGSize(width: size.width, height: ((size.height - 32) / 1.3) + 32))
+    }
+  }
+
+  private func check(
+    _ name: String, _ list: [SharedItem], isSmall: Bool, scheme: ColorScheme, size: CGSize
+  ) throws {
+    let data = try XCTUnwrap(render(list, isSmall: isSmall, scheme: scheme, size: size), name)
+    XCTAssertGreaterThan(data.count, 0)
+    if let dir = ProcessInfo.processInfo.environment["WIDGET_PREVIEW_DIR"] {
+      try data.write(to: URL(fileURLWithPath: dir).appendingPathComponent("\(name).png"))
+    }
+  }
+
+  private func render(
+    _ items: [SharedItem], isSmall: Bool, scheme: ColorScheme, size: CGSize
+  ) -> Data? {
     let palette = Palette(scheme)
     let view = ItemsWidgetContent(
       entry: ItemsEntry(date: .now, items: items), isSmall: isSmall, palette: palette,

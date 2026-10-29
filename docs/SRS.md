@@ -132,7 +132,7 @@ No photo reference needed here — widget and Siri are both text-first by design
 
 ### FR4 — Widget (Native, reads §4.1 shared cache)
 
-- **FR4.1** Small/Medium widget shows the 3–5 most recently updated items as name → location rows
+- **FR4.1** Small/Medium widget shows up to 3 of the most recently updated items as name → location rows (fewer at large text sizes, never clipped)
 - **FR4.2** Tapping a row deep-links to that item's detail screen (app launches if needed)
 - **FR4.3** Tapping empty widget space opens the app; the medium widget also has a "+" button that deep-links to Add Item (changed after device testing, 2026-10-24)
 - **FR4.4** Widget has a graceful empty state ("Nothing saved yet — tap to add your first"); tapping it deep-links to Add Item
