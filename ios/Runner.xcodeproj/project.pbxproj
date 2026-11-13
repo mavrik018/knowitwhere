@@ -22,10 +22,11 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		B7CC02A007D3D92DCE2D7DE1 /* SiriIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AF6F72BC492A3ACE1B3972E /* SiriIntents.swift */; };
 		CD89BA98B5C58438AAC027DC /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = CBE5AB28D7735259CC05DDDA /* PrivacyInfo.xcprivacy */; };
 		D54488EC79E8D9835CC20DC6 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D7AFD07F98BFA929728F4787 /* SwiftUI.framework */; };
 		E1A49BED52ABF0D47C204D57 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 89B6C857DA4B8975B5ED67D7 /* WidgetKit.framework */; };
-		E7991962A557BF9D4CFE1F5F /* KnowItWhereIntents in Frameworks */ = {isa = PBXBuildFile; productRef = 7F6BF717A87341CC60678B86 /* KnowItWhereIntents */; };
+		E7991962A557BF9D4CFE1F5F /* KnowItWhereCore in Frameworks */ = {isa = PBXBuildFile; productRef = 7F6BF717A87341CC60678B86 /* KnowItWhereCore */; };
 		FBE5FC747062E79677E2B623 /* KnowItWhereWidgetUI in Frameworks */ = {isa = PBXBuildFile; productRef = 07A4DA441074BF9FE34E0C8C /* KnowItWhereWidgetUI */; };
 /* End PBXBuildFile section */
 
@@ -78,6 +79,7 @@
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		48EE241EE877F31D5651153F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		4AF6F72BC492A3ACE1B3972E /* SiriIntents.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SiriIntents.swift; sourceTree = "<group>"; };
 		5A1E0C3F2E9B4D7100A1B2C3 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		5A1E0C3F2E9B4D7100A1B2D1 /* SpotlightPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightPlugin.swift; sourceTree = "<group>"; };
 		62D956706876DC05EEE7DAC2 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -120,7 +122,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */,
-				E7991962A557BF9D4CFE1F5F /* KnowItWhereIntents in Frameworks */,
+				E7991962A557BF9D4CFE1F5F /* KnowItWhereCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -216,6 +218,7 @@
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 				A416C132AD18E7CFF119C521 /* KnowItWhereShortcuts.swift */,
 				48EE241EE877F31D5651153F /* PrivacyInfo.xcprivacy */,
+				4AF6F72BC492A3ACE1B3972E /* SiriIntents.swift */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -280,7 +283,7 @@
 			name = Runner;
 			packageProductDependencies = (
 				78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */,
-				7F6BF717A87341CC60678B86 /* KnowItWhereIntents */,
+				7F6BF717A87341CC60678B86 /* KnowItWhereCore */,
 			);
 			productName = Runner;
 			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
@@ -423,6 +426,7 @@
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,
 				5A1E0C3F2E9B4D7100A1B2D2 /* SpotlightPlugin.swift in Sources */,
 				300AD8D6F97DC9DAF3D5D6C2 /* KnowItWhereShortcuts.swift in Sources */,
+				B7CC02A007D3D92DCE2D7DE1 /* SiriIntents.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -897,10 +901,10 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = FlutterGeneratedPluginSwiftPackage;
 		};
-		7F6BF717A87341CC60678B86 /* KnowItWhereIntents */ = {
+		7F6BF717A87341CC60678B86 /* KnowItWhereCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = BAF7E81A6092DE7FCE8FE4BC /* XCLocalSwiftPackageReference "KnowItWhereKit" */;
-			productName = KnowItWhereIntents;
+			productName = KnowItWhereCore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -1,11 +1,11 @@
 import AppIntents
 import Flutter
-import KnowItWhereIntents
 
-/// Siri phrases (FR5). The provider lives in the app target, not an extension,
-/// because only then can the app call `updateAppShortcutParameters()` when
-/// items change (see docs/siri-voice-ux.md). The intents still answer without
-/// bringing the app to the foreground.
+/// Siri phrases (FR5). The provider and its intents (SiriIntents.swift) live in
+/// the app target, not an extension or the Swift package: only then can the
+/// app call `updateAppShortcutParameters()` when items change, and only then
+/// do App Store builds register the shortcuts (see docs/siri-voice-ux.md).
+/// The intents still answer without bringing the app to the foreground.
 struct KnowItWhereShortcuts: AppShortcutsProvider {
   static var appShortcuts: [AppShortcut] {
     // One sentence: Siri resolves the item name from the phrase itself.
@@ -44,13 +44,6 @@ struct KnowItWhereShortcuts: AppShortcutsProvider {
       shortTitle: "Find an Item",
       systemImageName: "magnifyingglass"
     )
-  }
-}
-
-/// Pulls the package's intents into the app's App Intents metadata.
-struct RunnerIntentsPackage: AppIntentsPackage {
-  static var includedPackages: [any AppIntentsPackage.Type] {
-    [KnowItWhereIntentsPackage.self]
   }
 }
 

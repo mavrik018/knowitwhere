@@ -12,7 +12,7 @@ The widget and Siri wiring is in `ios/Runner.xcodeproj`. It was added with the `
   - `KnowItWhereWidgetExtension.entitlements` with `group.com.AandMapps.knowitwhere`
   - Uses the Flutter xcconfigs, and `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` come from `FLUTTER_BUILD_NAME` / `FLUTTER_BUILD_NUMBER`, so the extension's version always matches the app's (App Store validation rejects a mismatch)
 - **Runner**
-  - Links `KnowItWhereIntents`, and `Runner/KnowItWhereShortcuts.swift` holds the `AppShortcutsProvider`
+  - Links `KnowItWhereCore`. `Runner/SiriIntents.swift` holds the App Intents types (intents, `ItemEntity`, its query) and `Runner/KnowItWhereShortcuts.swift` the `AppShortcutsProvider`. They must stay in the app target: from the Swift package they don't register in App Store builds (see `docs/siri-voice-ux.md`)
   - Embeds the widget in **Embed Foundation Extensions**, which sits **above Thin Binary**. Otherwise Flutter builds fail with *"Cycle inside Runner"*
 - All targets: team `PUS7W2V7BL`, automatic signing.
 
