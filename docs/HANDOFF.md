@@ -43,7 +43,7 @@ Siri extension  ──┴─ read-only from the App Group JSON via ios/KnowItWhe
 | `lib/layout/` | iPad support: `window_size.dart` (compact / medium / expanded by window width), `dialog_page.dart` (Add/Edit as modal cards), `hover_lift.dart` (pointer hover) |
 | `lib/theme/app_theme.dart` | Cream / ink / orange tokens; `AppPalette` extension; iOS HIG type scale in `.sp` (ScreenUtil design size 411×914, set in `lib/app.dart`) |
 | `ios/Runner/` | `SpotlightPlugin.swift`, `Runner.entitlements` (App Group), `Info.plist` (usage strings, URL scheme) |
-| `ios/KnowItWhereKit/` | Swift package: `KnowItWhereCore` (cache reader, `ItemMatcher`, `VoiceCopy`, `DeepLink`), `KnowItWhereWidgetUI` (the widget), `KnowItWhereIntents` (`FindItemLocationIntent`). XCTests in `Tests/` |
+| `ios/KnowItWhereKit/` | Swift package: `KnowItWhereCore` (cache reader, `ItemMatcher`, `VoiceCopy`, `DeepLink`), `KnowItWhereWidgetUI` (the widget). The Siri intents are in the app target, `ios/Runner/SiriIntents.swift`. XCTests in `Tests/` |
 | `docs/phase-4-xcode-setup.md` | Step-by-step Xcode target creation with the exact entry files |
 | `docs/siri-voice-ux.md` | Siri phrases, spoken copy, matching rules |
 | `docs/app-store.md` | Listing copy, keywords, privacy answers, reviewer notes |
@@ -123,7 +123,7 @@ If the GUI isn't available, an alternative is scripting the targets with the `xc
 
 ## Task 2: One-sentence Siri phrase (done, PR #46)
 
-Built as below, with option (a) for refreshing names: the provider is in Runner and `SiriSink` calls `updateAppShortcutParameters()`. The device check (step 7) remains, as part of Task 5.
+Built as below, with option (a) for refreshing names: the provider is in Runner and `SiriSink` calls `updateAppShortcutParameters()`. **Changed after the 1.0.0 release:** the intents, `ItemEntity` and its query are no longer in the package. They moved to `ios/Runner/SiriIntents.swift`, because App Store builds don't register intents bridged from a Swift package (see `docs/siri-voice-ux.md`). The device check (step 7) remains, as part of Task 5.
 
 **Goal (agreed with the user):** "Hey Siri, **where's my passport in KnowItWhere**?" → spoken location, with no follow-up question and no app launch. The smart tip and the item detail screen already advertise this phrase (`lib/widgets/siri_bar.dart`, `lib/features/home/smart_tip.dart`, `lib/features/item_detail/item_detail_screen.dart`). The onboarding screen no longer shows it.
 

@@ -1,6 +1,6 @@
 # Siri voice UX (SRS Phase 1.4, FR5)
 
-Siri answers "where is it?" out loud **without opening the app** (FR5.3). Two intents in `ios/KnowItWhereKit/Sources/KnowItWhereIntents/` do this; both read the App Group shared cache:
+Siri answers "where is it?" out loud **without opening the app** (FR5.3). Two intents in `ios/Runner/SiriIntents.swift` (the app target) do this; both read the App Group shared cache:
 
 - `WhereIsItemIntent`: one sentence, with the item name in the phrase
 - `FindItemLocationIntent`: the fallback. Siri asks for the name
@@ -38,6 +38,8 @@ App Shortcut phrases can only contain app-defined parameter types (`AppEntity`/`
 Siri only knows the names it last fetched, so the app calls `KnowItWhereShortcuts.updateAppShortcutParameters()` after every add, edit and delete, and at launch. In Dart, `SiriSink` (`lib/platform/siri.dart`) runs after `SharedCacheSink`, so the cache is up to date when Siri reads it. It calls `refresh` on the `knowitwhere/siri` channel, which `SiriShortcutsPlugin` in `ios/Runner/KnowItWhereShortcuts.swift` handles.
 
 **Why the intents run in the app, not an App Intents extension:** the app can only call `updateAppShortcutParameters()` on a provider it contains. Apple DTS's guidance is that the `AppShortcutsProvider` and the intents it uses must be in the main app target for this ([developer forums](https://developer.apple.com/forums/thread/759160)). An extension has no way to learn that items changed. So `KnowItWhereShortcuts` is in Runner, and Runner links `KnowItWhereIntents` and includes it via `AppIntentsPackage`. With `openAppWhenRun = false`, iOS runs the intent in the background without bringing the app to the foreground. The Flutter engine starts with the window scene, so a Siri request doesn't start Dart.
+
+**Why they are in the app target, not the Swift package:** they used to live in `KnowItWhereKit` and were pulled in with `AppIntentsPackage`. That worked in USB/Xcode installs, but the App Store build (1.0.0) registered none of them: KnowItWhere was missing from the Shortcuts app, every phrase got "I didn't get that", and Spotlight's suggestion said "couldn't find shortcut". Apple DTS's rule is that the `AppShortcutsProvider` and the intents, entities and queries it uses must all be compiled into the main app target. Only the logic they call (`ItemLookup`, `ItemMatcher`, `VoiceCopy`, `SharedCache`) stays in `KnowItWhereCore`, where `swift test` covers it. To check a build, look at `Runner.app/Metadata.appintents/extract.actionsdata`: every action, entity and query must have a `6Runner…` mangled type name, and `extract.packagedata` must not list any included packages.
 
 ## Trigger phrases
 
