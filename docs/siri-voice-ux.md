@@ -45,14 +45,15 @@ Every phrase must contain the app name (an iOS rule). They are registered by `Kn
 
 One sentence (`{item}` is a saved item's name):
 
-- "Ask KnowItWhere where my {item} is"
+- "Ask KnowItWhere where my {item} is" / "… are"
 - "Ask KnowItWhere where I put my {item}"
 - "KnowItWhere, where's my {item}"
-- "KnowItWhere, where is my {item}"
+- "KnowItWhere, where is my {item}" / "where are my {item}"
 - "Where did I put my {item} in KnowItWhere"
 - "Where did I leave my {item} in KnowItWhere"
 - "Where's my {item} in KnowItWhere"
 - "Where is my {item} in KnowItWhere"
+- "Where are my {item} in KnowItWhere" (plurals: keys, glasses; Siri does not map "are" onto "is")
 
 There is deliberately no "Find my {item} in KnowItWhere": see *Find My overlap* below.
 

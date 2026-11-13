@@ -11,18 +11,23 @@ struct KnowItWhereShortcuts: AppShortcutsProvider {
     // One sentence: Siri resolves the item name from the phrase itself.
     // "Where's my …" and "Find my …" on their own belong to Find My, so the
     // phrases that lead with the app name or "where did I put" come first
-    // and there is no "Find my {item}" (see docs/siri-voice-ux.md).
+    // and there is no "Find my {item}" (see docs/siri-voice-ux.md). Plural
+    // forms matter: people lose keys and glasses, and Siri doesn't map
+    // "where are my keys" onto "where is my …".
     AppShortcut(
       intent: WhereIsItemIntent(),
       phrases: [
         "Ask \(.applicationName) where my \(\.$item) is",
+        "Ask \(.applicationName) where my \(\.$item) are",
         "Ask \(.applicationName) where I put my \(\.$item)",
         "\(.applicationName), where's my \(\.$item)",
         "\(.applicationName), where is my \(\.$item)",
+        "\(.applicationName), where are my \(\.$item)",
         "Where did I put my \(\.$item) in \(.applicationName)",
         "Where did I leave my \(\.$item) in \(.applicationName)",
         "Where's my \(\.$item) in \(.applicationName)",
         "Where is my \(\.$item) in \(.applicationName)",
+        "Where are my \(\.$item) in \(.applicationName)",
       ],
       shortTitle: "Where Is It?",
       systemImageName: "mappin.and.ellipse"
